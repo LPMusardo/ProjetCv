@@ -35,6 +35,8 @@ public class CVRepositoryTest {
         personRepository.deleteAll();
     }
 
+    //---------------------------------CRUD TESTS---------------------------------
+
     @Test
     public void createCVTest() {
         Person person = Person.builder()

@@ -39,6 +39,8 @@ public class ActivityRepositoryTest {
         activityRepository.deleteAll();
     }
 
+    //---------------------------------CRUD TESTS---------------------------------
+
     @Test
     public void createActivityTest() {
         Person person = Person.builder()
