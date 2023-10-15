@@ -1,22 +1,21 @@
 package com.example.projetcv.dao;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import com.example.projetcv.model.Activity;
 import com.example.projetcv.model.CV;
 import com.example.projetcv.model.Nature;
-
 import com.example.projetcv.model.Person;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.TransactionSystemException;
 
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.logging.Logger;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class ActivityRepositoryTest {
@@ -54,7 +53,7 @@ public class ActivityRepositoryTest {
         CV cv = CV.builder()
                 .person(person)
                 .build();
-        cvRepository.save(cv); //save
+        cvRepository.save(cv);
         Activity activity = Activity.builder()
                 .cv(cv)
                 .year(2022)
