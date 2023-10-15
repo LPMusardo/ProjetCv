@@ -50,10 +50,13 @@ public class Person {
     @Column(nullable = false)
     private String passwordHash;
 
-    //cascade = CascadeType.ALL  : pour que la suppression de la personne entraine la suppression du cv
+
+    // ATTENTION : One-to-one n'est en réalité jamais LAZY
+    // SRC: https://stackoverflow.com/questions/1444227/how-can-i-make-a-jpa-onetoone-relation-lazy
+    //
     // mappedby est utilisé dans l'entité qui n'est pas le propriétaire de la relation et qui ne contient pas la clé étrangère
     @JsonView(Views.Public.class)
-    @OneToOne(mappedBy = "person", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true, orphanRemoval = true)
+    @OneToOne(optional = true, mappedBy = "person", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private CV cv;
 
     @ElementCollection(fetch = FetchType.EAGER)
