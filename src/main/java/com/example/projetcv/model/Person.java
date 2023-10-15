@@ -1,13 +1,11 @@
 package com.example.projetcv.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -25,18 +23,14 @@ public class Person {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @NotBlank(message = "Can't be blank")
     @JsonView(com.example.projetcv.model.Views.Public.class)
-    @Basic(optional = false)
     @Column(nullable = false)
     private String name;
 
-    //@NotBlank(message = "Can't be blank")
-    //@JsonView(Views.Public.class)
+    @JsonView(Views.Public.class)
     @Column(nullable = false)
     private String firstName;
 
-    @NotBlank(message = "Can't be blank")
     @JsonView(Views.Public.class)
     @Basic
     @Column(unique=true, nullable = false)
@@ -63,7 +57,6 @@ public class Person {
     private CV cv;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @Column(nullable = false)
-    Set<String> roles = Set.of();
+    Set<String> roles;
 
 }

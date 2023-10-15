@@ -22,6 +22,7 @@ public class CV {
   @JsonView(Views.Internal.class)
   @ToString.Exclude
   @OneToOne(optional=false, fetch = FetchType.EAGER)
+  @JoinColumn(nullable = false)
   private Person person;
 
   @JsonView(Views.Public.class)

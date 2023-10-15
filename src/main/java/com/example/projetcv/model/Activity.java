@@ -20,6 +20,7 @@ public class Activity {
   @JsonView(Views.Internal.class)
   @ToString.Exclude
   @ManyToOne(optional=false)
+  @JoinColumn(nullable = false)
   private CV cv;
 
   @JsonView(Views.Public.class)
