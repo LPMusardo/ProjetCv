@@ -10,6 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -126,6 +128,79 @@ public class CVTest {
 
         });
     }
+
+
+
+    //---------------------------------CASCADE TESTS---------------------------------
+
+    @Test
+    public void deleteCascadeCVTest() {
+        Person person = Person.builder()
+                .name("John")
+                .firstName("Doe")
+                .birthday(LocalDate.now())
+                .email("john.doe@example.com")
+                .passwordHash("lehash")
+                .build();
+        Person savedPerson = personRepository.save(person);
+        CV cv = CV.builder()
+                .person(person)
+                .build();
+        CV savedCv = cvRepository.save(cv);
+        Activity activity = Activity.builder()
+                .cv(cv)
+                .year(2022)
+                .nature(Nature.PROJECT)
+                .title("Project Title")
+                .build();
+        Activity savedActivity = activityRepository.save(activity);
+
+        savedPerson.setCv(null);             // Delete CV
+        personRepository.save(savedPerson);  //
+
+        List<CV> retrievedCVs = cvRepository.findAll();
+        assertThat(retrievedCVs.size()).isEqualTo(0);
+
+        List<Activity> retrievedActivities = activityRepository.findAll();
+        assertThat(retrievedActivities.size()).isEqualTo(0);
+    }
+
+    @Test
+    public void deleteCascadeCVOppositeTest() {
+        Person person = Person.builder()
+                .name("John")
+                .firstName("Doe")
+                .birthday(LocalDate.now())
+                .email("john.doe@example.com")
+                .passwordHash("lehash")
+                .build();
+        Person savedPerson = personRepository.save(person);
+        CV cv = CV.builder()
+                .person(person)
+                .build();
+        CV savedCV = cvRepository.save(cv);
+        Activity activity = Activity.builder()
+                .cv(cv)
+                .year(2022)
+                .nature(Nature.PROJECT)
+                .title("Project Title")
+                .build();
+        Activity savedActivity = activityRepository.save(activity);
+
+        Optional<CV> retrievedCV = cvRepository.findById(savedCV.getId());
+        retrievedCV.get().getActivities().removeIf(a -> a.getId().equals(savedActivity.getId()));  // Delete
+        cvRepository.save(retrievedCV.get());                                                      //
+
+
+        List<CV> retrievedCVs = cvRepository.findAll();
+        assertThat(retrievedCVs.size()).isEqualTo(1);
+        List<Activity> retrievedActivities = activityRepository.findAll();
+        assertThat(retrievedActivities.size()).isEqualTo(0);
+
+    }
+
+
+
 
 
 

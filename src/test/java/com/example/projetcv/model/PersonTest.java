@@ -1,13 +1,27 @@
 package com.example.projetcv.model;
 
+import com.example.projetcv.dao.ActivityRepository;
 import com.example.projetcv.dao.CVRepository;
 import com.example.projetcv.dao.PersonRepository;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
+
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -18,18 +32,23 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 public class PersonTest {
 
-    @BeforeEach
-    public void cleanPersonTable(){
-        personRepository.deleteAll();
-    }
+    Logger logger = Logger.getLogger(this.getClass().getName());
 
     @Autowired
-    private PersonRepository personRepository;
+    private ActivityRepository activityRepository;
 
     @Autowired
     private CVRepository cvRepository;
 
-    Logger logger = Logger.getLogger(this.getClass().getName());
+    @Autowired
+    private PersonRepository personRepository;
+    @BeforeEach
+    public void cleanPersonTable(){
+        personRepository.deleteAll();
+        cvRepository.deleteAll();
+        activityRepository.deleteAll();
+    }
+
 
     //---------------------------------CONSTRAINTS TESTS---------------------------------
 
@@ -274,6 +293,278 @@ public class PersonTest {
             Person savedPerson = personRepository.save(person);
         });
     }
+
+
+    //---------------------------------FETCH-TYPE TESTS---------------------------------
+
+    //@Autowired
+    //EntityManager entityManager;
+    //entityManager.flush();
+    //entityManager.clear();
+    //entityManager.close();
+    //assertThat(retrievedPerson.get().getCv().getActivities().get(0).getTitle()).isEqualTo("Project Title");
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+
+    @Test
+    @Disabled // one-to-one NE PEUX PAS ETRE LAZY
+    public void cvEagerFetchTest(){
+        Person savedPerson;
+
+        // Définition de la transaction 1
+        TransactionDefinition transactionDefinition1 = new DefaultTransactionDefinition();
+        TransactionStatus transactionStatus1 = transactionManager.getTransaction(transactionDefinition1);
+
+        try {
+            // Effectuer les opérations de la première transaction
+            Person person = Person.builder()
+                    .name("John")
+                    .firstName("Doe")
+                    .birthday(LocalDate.now())
+                    .email("john.doe@example.com")
+                    .passwordHash("lehash")
+                    .build();
+            savedPerson = personRepository.save(person);
+            CV cv = CV.builder()
+                    .person(person)
+                    .build();
+            cvRepository.save(cv); //save
+            Activity activity = Activity.builder()
+                    .cv(cv)
+                    .year(2022)
+                    .nature(Nature.PROJECT)
+                    .title("Project Title")
+                    .build();
+            activityRepository.save(activity);
+            // Commit de la transaction 1
+            transactionManager.commit(transactionStatus1);
+        } catch (Exception e) {
+            // Rollback de la transaction 1 en cas de l'échec
+            transactionManager.rollback(transactionStatus1);
+            throw e;
+        }
+
+        // Définition de la transaction 2
+        TransactionDefinition transactionDefinition2 = new DefaultTransactionDefinition();
+        TransactionStatus transactionStatus2 = transactionManager.getTransaction(transactionDefinition2);
+
+        try {
+            // Effectuer les opérations de la deuxième transaction
+            Optional<Person> retrievedPerson = personRepository.findById(savedPerson.getId());
+            logger.info("retrievedPerson::: " + retrievedPerson);
+
+            assertThat(retrievedPerson).isPresent();
+            assertThat(retrievedPerson.get().getCv().getActivities().get(0).getTitle()).isEqualTo("Project Title");
+            // Commit de la transaction 2
+            transactionManager.commit(transactionStatus2);
+        } catch (Exception e) {
+            // Rollback de la transaction 2 en cas d'échec
+            transactionManager.rollback(transactionStatus2);
+            throw e;
+        }
+
+    }
+
+
+    //---------------------------------CASCADE TESTS---------------------------------
+
+
+    @Test
+    public void deleteCascadeCVTest() {
+        Person person = Person.builder()
+                .name("John")
+                .firstName("Doe")
+                .birthday(LocalDate.now())
+                .email("john.doe@example.com")
+                .passwordHash("lehash")
+                .build();
+        Person savedPerson = personRepository.save(person);
+        CV cv = CV.builder()
+                .person(person)
+                .build();
+        CV savedCV = cvRepository.save(cv);
+
+        personRepository.deleteById(savedPerson.getId());
+
+        Optional<Person> retrievedPerson = personRepository.findById(person.getId());
+        assertThat(retrievedPerson).isNotPresent();
+        Optional<CV> retrievedCV = cvRepository.findById(savedCV.getId());
+        assertThat(retrievedCV).isNotPresent();
+    }
+
+
+    @Test
+    public void deleteCascadeCVOppositeTest() {
+        Person person = Person.builder()
+                .name("John")
+                .firstName("Doe")
+                .birthday(LocalDate.now())
+                .email("john.doe@example.com")
+                .passwordHash("lehash")
+                .build();
+        Person savedPerson = personRepository.save(person);
+        CV cv = CV.builder()
+                .person(person)
+                .build();
+        CV savedCV = cvRepository.save(cv);
+
+        person.setCv(null);             // Delete
+        personRepository.save(person);  //
+
+
+        Optional<Person> retrievedPerson = personRepository.findById(person.getId());
+        assertThat(retrievedPerson).isPresent();
+        Optional<CV> retrievedCV = cvRepository.findById(savedCV.getId());
+        assertThat(retrievedCV).isNotPresent();
+    }
+
+
+    @Test
+    public void updateCascadeCVTest() {
+        //create
+        Person person = Person.builder()
+                .name("John")
+                .firstName("Doe")
+                .birthday(LocalDate.now())
+                .email("john.doe@example.com")
+                .passwordHash("lehash")
+                .build();
+        Person savedPerson = personRepository.save(person);
+        CV cv = CV.builder()
+                .person(person)
+                .build();
+        CV savedCV = cvRepository.save(cv);
+        Activity activity = Activity.builder()
+                .cv(savedCV)
+                .year(2022)
+                .nature(Nature.PROJECT)
+                .title("Project Title")
+                .build();
+        Activity savedActivity = activityRepository.save(activity);
+
+
+        // Update person and cv
+        Person personFull = personRepository.findById(savedPerson.getId()).get();
+        personFull.setName("New-Name");
+        CV cvFull = cvRepository.findById(savedCV.getId()).get();
+        cvFull.getActivities().clear();
+        personFull.setCv(cvFull);
+
+        // Save ONLY person (cascade save cv)
+        personRepository.save(personFull);
+
+        // Check if person and cv are updated
+        Optional<Person> retrievedPerson = personRepository.findById(person.getId());
+        assertThat(retrievedPerson).isPresent();
+        assertThat(retrievedPerson.get().getName()).isEqualTo("New-Name");
+        Optional<CV> retrievedCV = cvRepository.findById(savedCV.getId());
+        assertThat(retrievedCV).isPresent();
+        assertThat(retrievedCV.get().getActivities().size()).isEqualTo(0);
+    }
+
+    @Test
+    public void updateCascadeCVOppositeTest() {
+        //create
+        Person person = Person.builder()
+                .name("John")
+                .firstName("Doe")
+                .birthday(LocalDate.now())
+                .email("john.doe@example.com")
+                .passwordHash("lehash")
+                .build();
+        Person savedPerson = personRepository.save(person);
+        CV cv = CV.builder()
+                .person(person)
+                .build();
+        CV savedCV = cvRepository.save(cv);
+        Activity activity = Activity.builder()
+                .cv(savedCV)
+                .year(2022)
+                .nature(Nature.PROJECT)
+                .title("Project Title")
+                .build();
+        Activity savedActivity = activityRepository.save(activity);
+
+
+        // Update person and cv
+        Person personFull = personRepository.findById(savedPerson.getId()).get();
+        personFull.setName("New-Name");
+        CV cvFull = cvRepository.findById(savedCV.getId()).get();
+        cvFull.getActivities().clear();
+        //personFull.setCv(cvFull);
+        cvFull.setPerson(personFull);
+
+        // Save ONLY person (cascade update cv)
+        cvRepository.save(cvFull);
+
+        // Check if person and cv are updated
+        Optional<Person> retrievedPerson = personRepository.findById(person.getId());
+        assertThat(retrievedPerson).isPresent();
+        assertThat(retrievedPerson.get().getName()).isEqualTo("John");
+        Optional<CV> retrievedCV = cvRepository.findById(savedCV.getId());
+        assertThat(retrievedCV).isPresent();
+        assertThat(retrievedCV.get().getActivities().size()).isEqualTo(0);
+    }
+
+
+    @Test
+    public void saveCascadeCVTest() {
+        //create
+        Person person = Person.builder()
+                .name("John")
+                .firstName("Doe")
+                .birthday(LocalDate.now())
+                .email("john.doe@example.com")
+                .passwordHash("lehash")
+                .build();
+        CV cv = CV.builder()
+                .person(person)
+                .build();
+
+        // Save ONLY person (cascade save cv)
+        person.setCv(cv);
+        Person savedPerson = personRepository.save(person);
+
+        // Check if person and cv are saved
+        Optional<Person> retrievedPerson = personRepository.findById(savedPerson.getId());
+        assertThat(retrievedPerson).isPresent();
+        assertThat(retrievedPerson.get().getName()).isEqualTo("John");
+
+        List<CV> cvs = cvRepository.findAll();
+        assertThat(cvs.size()).isGreaterThan(0);
+        assertThat(cvs.get(0).getPerson()).isNotNull();
+    }
+
+    @Test
+    public void saveCascadeCVOppositeTest() {
+        //create
+        Person person = Person.builder()
+                .name("John")
+                .firstName("Doe")
+                .birthday(LocalDate.now())
+                .email("john.doe@example.com")
+                .passwordHash("lehash")
+                .build();
+        CV cv = CV.builder()
+                .person(person)
+                .build();
+
+        // Save ONLY cv
+        cv.setPerson(person);
+        Exception e = assertThrows(InvalidDataAccessApiUsageException.class, ()->{
+            CV savedCv = cvRepository.save(cv);
+        });
+        assertTrue(e.getMessage().contains("transient instance must be saved before current operation"));
+    }
+
+
+
+
+
+
+
+
+
 
 
 
