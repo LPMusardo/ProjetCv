@@ -43,6 +43,24 @@
 			<artifactId>hsqldb</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+		<!--Populate Database-->
+		<dependency>
+			<groupId>com.github.javafaker</groupId>
+			<artifactId>javafaker</artifactId>
+			<version>1.0.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>dk.brics</groupId>
+			<artifactId>automaton</artifactId>
+			<version>1.12-4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+
 		<!--Boiler plate-->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
