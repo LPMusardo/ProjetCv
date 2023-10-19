@@ -27,7 +27,7 @@ public class PopulateDataBase implements CommandLineRunner {
     PasswordEncoder passwordEncoder;
 
     private Random random = new Random();
-    Faker faker = new Faker(new Locale("fr-FR"), new Random(42));
+    Faker faker = new Faker(new Locale("fr", "FR"), new Random(42));
 
 
     @Override
@@ -50,19 +50,13 @@ public class PopulateDataBase implements CommandLineRunner {
             String pLastName = stripAccents(faker.name().lastName());
 
             // required
-            var person = Person.builder()
-                    .name(stripAccents(faker.name().firstName()))
-                    .firstName(stripAccents(faker.name().lastName()))
-                    .birthday(LocalDate.ofEpochDay(randomInt(0, 1003502741))) //2001
-                    .email(faker.internet().emailAddress(pFirstName.toLowerCase()+i))
-                    .passwordHash(hash)
-                    .website(pFirstName+"."+pLastName+".com")
-                    .build();
+            var person = Person.builder().name(pFirstName).firstName(pLastName).birthday(LocalDate.ofEpochDay(randomInt(0, 1003502741))) //2001
+                    .email(faker.internet().emailAddress(pFirstName.toLowerCase() + i)).passwordHash(hash).website(pFirstName + "." + pLastName + ".com").build();
             // optional
-            if(i%2==0) {
+            if (i % 2 == 0) {
                 person.setRoles(Set.of("USER"));
             }
-            if(i%10!=0) {
+            if (i % 10 != 0) {
                 CV cv = generateCv(person);
                 person.setCv(cv);
             }
@@ -73,46 +67,28 @@ public class PopulateDataBase implements CommandLineRunner {
     }
 
     private CV generateCv(Person person) {
-        CV cv = CV.builder()
-                .person(person)
-                .build();
+        CV cv = CV.builder().person(person).build();
+        int nbActivities = randomInt(1, 3);
+        List<Activity> activities = new ArrayList<>(nbActivities);
 
-        //TODO random number of activities
-        Activity activity = Activity.builder()
-                .cv(cv)
-                .year(randomInt(2000, 2023))
-                .nature(Nature.randomNature())
-                .title("Project Title")
-                .build();
-        cv.setActivities(List.of(activity));
+        for (int i = 0; i < nbActivities; i++) {
+            Activity activity = Activity.builder().cv(cv).year(randomInt(2000, 2023)).nature(Nature.randomNature()).title(faker.job().seniority() + " " + faker.job().position() + faker.job().field() + " " + faker.job().keySkills() + " " + faker.job().title()).build();
+            if (random.nextBoolean()) activity.setWebAddress(faker.internet().url());
+            if (random.nextBoolean()) activity.setDescription(faker.lorem().paragraph(randomInt(1, 3)));
+            activities.add(activity);
+        }
+        cv.setActivities(activities);
 
         return cv;
     }
 
 
-    private void generateCustomPersons(){
-        Person amdinLP = Person.builder()
-                .firstName("lp")
-                .name("mu")
-                .birthday(LocalDate.now())
-                .email("lpmusardo@gmail.com")
-                .roles(Set.of("ADMIN", "USER"))
-                .passwordHash(passwordEncoder.encode("password"))
-                .website("https://www.linkedin.com/in/lpmusardo/")
-                .build();
-        Person userMaxime = Person.builder()
-                .firstName("maxime")
-                .name("gu")
-                .birthday(LocalDate.now())
-                .email("maxime@gmail.com")
-                .roles(Set.of("USER"))
-                .passwordHash(passwordEncoder.encode("password"))
-                .website("https://www.linkedin.com/in/maxime/")
-                .build();
+    private void generateCustomPersons() {
+        Person amdinLP = Person.builder().firstName("lp").name("mu").birthday(LocalDate.now()).email("lpmusardo@gmail.com").roles(Set.of("ADMIN", "USER")).passwordHash(passwordEncoder.encode("password")).website("https://www.linkedin.com/in/lpmusardo/").build();
+        Person userMaxime = Person.builder().firstName("maxime").name("gu").birthday(LocalDate.now()).email("maxime@gmail.com").roles(Set.of("USER")).passwordHash(passwordEncoder.encode("password")).website("https://www.linkedin.com/in/maxime/").build();
         personRepository.save(amdinLP);
         personRepository.save(userMaxime);
     }
-
 
 
     public int randomInt(int min, int max) {
