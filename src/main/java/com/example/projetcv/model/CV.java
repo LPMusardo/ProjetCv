@@ -1,5 +1,8 @@
 package com.example.projetcv.model;
 
+import com.fasterxml.jackson.annotation.JacksonInject;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+
 public class CV {
 
   @JsonView(Views.Internal.class)
@@ -19,13 +23,15 @@ public class CV {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
+  @JsonBackReference
   @JsonView(Views.Internal.class)
   @ToString.Exclude
   @OneToOne(optional=false, fetch = FetchType.EAGER)
   @JoinColumn(nullable = false)
   private Person person;
 
-  @JsonView(Views.Public.class)
+
+  @JsonManagedReference
   @OneToMany(mappedBy = "cv", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
   private List<Activity> activities = new ArrayList<>();
 }

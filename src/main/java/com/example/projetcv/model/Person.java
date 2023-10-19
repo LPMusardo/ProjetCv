@@ -1,5 +1,6 @@
 package com.example.projetcv.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -55,6 +56,7 @@ public class Person {
     // SRC: https://stackoverflow.com/questions/1444227/how-can-i-make-a-jpa-onetoone-relation-lazy
     //
     // mappedby est utilisé dans l'entité qui n'est pas le propriétaire de la relation et qui ne contient pas la clé étrangère
+    @JsonManagedReference
     @JsonView(Views.Public.class)
     @OneToOne(optional = true, mappedBy = "person", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private CV cv;

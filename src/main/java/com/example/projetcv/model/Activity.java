@@ -1,5 +1,6 @@
 package com.example.projetcv.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import lombok.*;
@@ -16,7 +17,7 @@ public class Activity {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
-
+  @JsonBackReference
   @JsonView(Views.Internal.class)
   @ToString.Exclude
   @ManyToOne(optional=false)
