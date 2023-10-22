@@ -1,13 +1,11 @@
 package com.example.projetcv.web;
 
 
-import com.example.projetcv.dao.PersonRepository;
-import com.example.projetcv.model.Person;
-import com.example.projetcv.service.UserService;
+import com.example.projetcv.dao.UserRepository;
+import com.example.projetcv.model.User;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,7 +23,7 @@ public class PublicController {
     private ModelMapper modelMapper = new ModelMapper();
 
     @Autowired
-    PersonRepository personRepository;
+    UserRepository userRepository;
 
 
 
@@ -36,8 +34,8 @@ public class PublicController {
     }
 
     @GetMapping("/users")
-    public List<Person> users(HttpServletRequest req) {
-        return personRepository.findAll();
+    public List<User> users(HttpServletRequest req) {
+        return userRepository.findAll();
     }
 
 

@@ -16,7 +16,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Person {
+public class User {
 
 
 
@@ -58,7 +58,7 @@ public class Person {
     // mappedby est utilisé dans l'entité qui n'est pas le propriétaire de la relation et qui ne contient pas la clé étrangère
     @JsonManagedReference
     @JsonView(Views.Public.class)
-    @OneToOne(optional = true, mappedBy = "person", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToOne(optional = true, mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private CV cv;
 
     @ElementCollection(fetch = FetchType.EAGER)

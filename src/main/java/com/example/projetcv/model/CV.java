@@ -1,6 +1,5 @@
 package com.example.projetcv.model;
 
-import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -28,7 +27,7 @@ public class CV {
   @ToString.Exclude
   @OneToOne(optional=false, fetch = FetchType.EAGER)
   @JoinColumn(nullable = false)
-  private Person person;
+  private User user;
 
 
   @JsonManagedReference

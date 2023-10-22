@@ -5,15 +5,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.example.projetcv.model.Activity;
 import com.example.projetcv.model.CV;
 import com.example.projetcv.model.Nature;
-import com.example.projetcv.model.Person;
+import com.example.projetcv.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -25,30 +23,30 @@ public class CVRepositoryTest {
     private CVRepository cvRepository;
 
     @Autowired
-    private PersonRepository personRepository;
+    private UserRepository userRepository;
 
     Logger logger = Logger.getLogger(this.getClass().getName());
 
     @BeforeEach
     public void cleanDatabase() {
         cvRepository.deleteAll();
-        personRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     //---------------------------------CRUD TESTS---------------------------------
 
     @Test
     public void createCVTest() {
-        Person person = Person.builder()
+        User user = User.builder()
                 .name("John")
                 .firstName("Doe")
                 .birthday(LocalDate.now())
                 .email("john.doe@example.com")
                 .passwordHash("lehash")
                 .build();
-        personRepository.save(person);
+        userRepository.save(user);
         CV cv = CV.builder()
-                .person(person)
+                .user(user)
                 .build();
         CV savedCV = cvRepository.save(cv); //save
         logger.info("savedCV: " + savedCV);
@@ -59,37 +57,37 @@ public class CVRepositoryTest {
 
     @Test
     public void readCVTest() {
-        Person person = Person.builder()
+        User user = User.builder()
                 .name("John")
                 .firstName("Doe")
                 .birthday(LocalDate.now())
                 .email("john.doe@example.com")
                 .passwordHash("lehash")
                 .build();
-        personRepository.save(person);
+        userRepository.save(user);
         CV cv = CV.builder()
-                .person(person)
+                .user(user)
                 .build();
         CV savedCV = cvRepository.save(cv);
         Optional<CV> retrievedCV = cvRepository.findById(savedCV.getId()); //Read
 
 
         assertThat(retrievedCV).isPresent();
-        assertThat(retrievedCV.get().getPerson().getName()).isEqualTo(person.getName());
+        assertThat(retrievedCV.get().getUser().getName()).isEqualTo(user.getName());
     }
 
     @Test
     public void updateCVTest() {
-        Person personA = Person.builder()
+        User userA = User.builder()
                 .name("John")
                 .firstName("Doe")
                 .birthday(LocalDate.now())
                 .email("john.doe@example.com")
                 .passwordHash("lehash")
                 .build();
-        personRepository.save(personA);
+        userRepository.save(userA);
         CV cv = CV.builder()
-                .person(personA)
+                .user(userA)
                 .build();
         CV savedCV = cvRepository.save(cv);
 
@@ -105,28 +103,28 @@ public class CVRepositoryTest {
 
         @Test
         public void deleteCVTest() {
-            Person person = Person.builder()
+            User user = User.builder()
                     .name("John")
                     .firstName("Doe")
                     .birthday(LocalDate.now())
                     .email("john.doe@example.com")
                     .passwordHash("lehash")
                     .build();
-            personRepository.save(person);
+            userRepository.save(user);
 
             CV cv = CV.builder()
-                    .person(person)
+                    .user(user)
                     .build();
             CV savedCV = cvRepository.save(cv);
 
-            person.setCv(null);             // Delete
-            personRepository.save(person);  //
+            user.setCv(null);             // Delete
+            userRepository.save(user);  //
 
             Optional<CV> retrievedCV = cvRepository.findById(savedCV.getId());
-            Optional<Person> retrievedPerson = personRepository.findById(person.getId());
+            Optional<User> retrievedUser = userRepository.findById(user.getId());
 
             assertThat(retrievedCV).isNotPresent();
-            assertThat(retrievedPerson).isPresent();
+            assertThat(retrievedUser).isPresent();
     }
 
 

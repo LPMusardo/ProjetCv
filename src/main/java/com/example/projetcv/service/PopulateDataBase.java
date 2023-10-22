@@ -1,10 +1,10 @@
 package com.example.projetcv.service;
 
-import com.example.projetcv.dao.PersonRepository;
+import com.example.projetcv.dao.UserRepository;
 import com.example.projetcv.model.Activity;
 import com.example.projetcv.model.CV;
 import com.example.projetcv.model.Nature;
-import com.example.projetcv.model.Person;
+import com.example.projetcv.model.User;
 import com.github.javafaker.Faker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -21,7 +21,7 @@ import static org.apache.commons.lang3.StringUtils.stripAccents;
 public class PopulateDataBase implements CommandLineRunner {
 
     @Autowired
-    PersonRepository personRepository;
+    UserRepository userRepository;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -33,41 +33,41 @@ public class PopulateDataBase implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         clearDb();
-        generateCustomPersons();
-        generateRandomPersons(10);
+        generateCustomUsers();
+        generateRandomUsers(10);
     }
 
     private void clearDb() {
-        personRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
-    private void generateRandomPersons(int numberOfPerson) {
+    private void generateRandomUsers(int numberOfUser) {
         String hash = passwordEncoder.encode("password");
 
-        //List<Person> persons = new ArrayList<>();
-        for (int i = 0; i < numberOfPerson; i++) {
+        //List<User> users = new ArrayList<>();
+        for (int i = 0; i < numberOfUser; i++) {
             String pFirstName = stripAccents(faker.name().firstName());
             String pLastName = stripAccents(faker.name().lastName());
 
             // required
-            var person = Person.builder().name(pFirstName).firstName(pLastName).birthday(LocalDate.ofEpochDay(randomInt(0, 1003502741))) //2001
+            var user = User.builder().name(pFirstName).firstName(pLastName).birthday(LocalDate.ofEpochDay(randomInt(0, 1003502741))) //2001
                     .email(faker.internet().emailAddress(pFirstName.toLowerCase() + i)).passwordHash(hash).website(pFirstName + "." + pLastName + ".com").build();
             // optional
             if (i % 2 == 0) {
-                person.setRoles(Set.of("USER"));
+                user.setRoles(Set.of("USER"));
             }
             if (i % 10 != 0) {
-                CV cv = generateCv(person);
-                person.setCv(cv);
+                CV cv = generateCv(user);
+                user.setCv(cv);
             }
 
-            personRepository.save(person);
+            userRepository.save(user);
         }
 
     }
 
-    private CV generateCv(Person person) {
-        CV cv = CV.builder().person(person).build();
+    private CV generateCv(User user) {
+        CV cv = CV.builder().user(user).build();
         int nbActivities = randomInt(1, 3);
         List<Activity> activities = new ArrayList<>(nbActivities);
 
@@ -83,11 +83,11 @@ public class PopulateDataBase implements CommandLineRunner {
     }
 
 
-    private void generateCustomPersons() {
-        Person amdinLP = Person.builder().firstName("lp").name("mu").birthday(LocalDate.now()).email("lpmusardo@gmail.com").roles(Set.of("ADMIN", "USER")).passwordHash(passwordEncoder.encode("password")).website("https://www.linkedin.com/in/lpmusardo/").build();
-        Person userMaxime = Person.builder().firstName("maxime").name("gu").birthday(LocalDate.now()).email("maxime@gmail.com").roles(Set.of("USER")).passwordHash(passwordEncoder.encode("password")).website("https://www.linkedin.com/in/maxime/").build();
-        personRepository.save(amdinLP);
-        personRepository.save(userMaxime);
+    private void generateCustomUsers() {
+        User amdinLP = User.builder().firstName("lp").name("mu").birthday(LocalDate.now()).email("lpmusardo@gmail.com").roles(Set.of("ADMIN", "USER")).passwordHash(passwordEncoder.encode("password")).website("https://www.linkedin.com/in/lpmusardo/").build();
+        User userMaxime = User.builder().firstName("maxime").name("gu").birthday(LocalDate.now()).email("maxime@gmail.com").roles(Set.of("USER")).passwordHash(passwordEncoder.encode("password")).website("https://www.linkedin.com/in/maxime/").build();
+        userRepository.save(amdinLP);
+        userRepository.save(userMaxime);
     }
 
 

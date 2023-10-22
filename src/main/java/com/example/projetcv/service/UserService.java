@@ -1,7 +1,7 @@
 package com.example.projetcv.service;
 
-import com.example.projetcv.dao.PersonRepository;
-import com.example.projetcv.model.Person;
+import com.example.projetcv.dao.UserRepository;
+import com.example.projetcv.model.User;
 import com.example.projetcv.security.JwtHelper;
 import com.example.projetcv.security.MyJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +13,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.List;
+
 @Service
 @Profile("usejwt")
 public class UserService {
 
     @Autowired
-    private PersonRepository personRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -32,47 +34,56 @@ public class UserService {
     public String login(String username, String password) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-            var user = personRepository.findByEmail(username).get();
+            var user = userRepository.findByEmail(username).get();
             return jwtTokenProvider.createToken(user);
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return e.getMessage();
             //throw new MyJwtException("Invalid username/password supplied", HttpStatus.UNPROCESSABLE_ENTITY);
         }
     }
 
     public String logout(HttpServletRequest req) {
         try {
-           return jwtTokenProvider.removeToken(jwtTokenProvider.resolveToken(req));
+            return jwtTokenProvider.removeToken(jwtTokenProvider.resolveToken(req));
         } catch (Exception e) {
             throw new MyJwtException("Invalid token", HttpStatus.UNPROCESSABLE_ENTITY);
         }
     }
 
-    public String signup(Person user) {
-        if (personRepository.findByEmail(user.getEmail()).isPresent()) {
+    public String signup(User user) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new MyJwtException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
         }
         user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
-        personRepository.save(user);
+        userRepository.save(user);
         return jwtTokenProvider.createToken(user);
     }
 
     public void delete(String email) {
-        personRepository.deleteByEmail(email);
+        userRepository.deleteByEmail(email);
     }
 
-    public Person search(String email) {
-        return personRepository.findByEmail(email)
+    public User search(String email) {
+        return userRepository.findByEmail(email)
                 .orElseThrow(() -> new MyJwtException("The user doesn't exist", HttpStatus.NOT_FOUND));
     }
 
-    public Person whoami(HttpServletRequest req) {
+    public User whoami(HttpServletRequest req) {
         return search(jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(req)));
     }
 
     public String refresh(String email) {
-        return jwtTokenProvider.createToken(personRepository.findByEmail(email).get());
+        return jwtTokenProvider.createToken(userRepository.findByEmail(email).get());
     }
+
+    public User update(User user) {
+        return userRepository.save(user);
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
 
 }

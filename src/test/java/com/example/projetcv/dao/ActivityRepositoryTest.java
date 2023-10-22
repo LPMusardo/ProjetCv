@@ -3,12 +3,11 @@ package com.example.projetcv.dao;
 import com.example.projetcv.model.Activity;
 import com.example.projetcv.model.CV;
 import com.example.projetcv.model.Nature;
-import com.example.projetcv.model.Person;
+import com.example.projetcv.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.TransactionSystemException;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -27,13 +26,13 @@ public class ActivityRepositoryTest {
     private CVRepository cvRepository;
 
     @Autowired
-    private PersonRepository personRepository;
+    private UserRepository userRepository;
 
     Logger logger = Logger.getLogger(this.getClass().getName());
 
     @BeforeEach
     public void cleanDatabase() {
-        personRepository.deleteAll();
+        userRepository.deleteAll();
         cvRepository.deleteAll();
         activityRepository.deleteAll();
     }
@@ -42,16 +41,16 @@ public class ActivityRepositoryTest {
 
     @Test
     public void createActivityTest() {
-        Person person = Person.builder()
+        User user = User.builder()
                 .name("John")
                 .firstName("Doe")
                 .birthday(LocalDate.now())
                 .email("john.doe@example.com")
                 .passwordHash("lehash")
                 .build();
-        personRepository.save(person);
+        userRepository.save(user);
         CV cv = CV.builder()
-                .person(person)
+                .user(user)
                 .build();
         cvRepository.save(cv);
         Activity activity = Activity.builder()
@@ -69,16 +68,16 @@ public class ActivityRepositoryTest {
 
     @Test
     public void readActivityTest() {
-        Person person = Person.builder()
+        User user = User.builder()
                 .name("John")
                 .firstName("Doe")
                 .birthday(LocalDate.now())
                 .email("john.doe@example.com")
                 .passwordHash("lehash")
                 .build();
-        personRepository.save(person);
+        userRepository.save(user);
         CV cv = CV.builder()
-                .person(person)
+                .user(user)
                 .build();
         cvRepository.save(cv); //save
         Activity activity = Activity.builder()
@@ -96,16 +95,16 @@ public class ActivityRepositoryTest {
 
     @Test
     public void updateActivityTest() {
-        Person person = Person.builder()
+        User user = User.builder()
                 .name("John")
                 .firstName("Doe")
                 .birthday(LocalDate.now())
                 .email("john.doe@example.com")
                 .passwordHash("lehash")
                 .build();
-        personRepository.save(person);
+        userRepository.save(user);
         CV cv = CV.builder()
-                .person(person)
+                .user(user)
                 .build();
         cvRepository.save(cv); //save
         Activity activity = Activity.builder()
@@ -125,16 +124,16 @@ public class ActivityRepositoryTest {
 
     @Test
     public void deleteActivityTest() {
-        Person person = Person.builder()
+        User user = User.builder()
                 .name("John")
                 .firstName("Doe")
                 .birthday(LocalDate.now())
                 .email("john.doe@example.com")
                 .passwordHash("lehash")
                 .build();
-        personRepository.save(person);
+        userRepository.save(user);
         CV cv = CV.builder()
-                .person(person)
+                .user(user)
                 .build();
         CV savedCV = cvRepository.save(cv); //save
         Activity activity = Activity.builder()
