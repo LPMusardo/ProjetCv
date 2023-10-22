@@ -1,7 +1,7 @@
 package com.example.projetcv.security;
 
 
-import com.example.projetcv.model.Person;
+import com.example.projetcv.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -15,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
@@ -56,10 +57,11 @@ public class JwtHelper {
     //---------------------------------------------------------------------------------------------------
 
 
+    public String createToken(User user) {
 
-    public String createToken(Person user) {
-
-        Claims claims = Jwts.claims().setSubject(user.getEmail());
+        Claims claims = Jwts.claims().setSubject("user");
+        claims.put("mail", user.getEmail());
+        claims.put("id", user.getId());
         claims.put("auth", user.getRoles().stream().filter(Objects::nonNull).collect(Collectors.toList()));
 
         Date now = new Date();
@@ -84,7 +86,11 @@ public class JwtHelper {
 
 
     public String getUsername(String token) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get("mail",String.class);
+    }
+
+    public String getId(String token) {
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get("id",String.class);
     }
 
 
@@ -127,8 +133,6 @@ public class JwtHelper {
         }
         System.out.println("size: " + whiteList.size());
     }
-
-
 
 
 }
