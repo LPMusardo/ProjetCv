@@ -1,6 +1,6 @@
 package com.example.projetcv.web;
 
-import com.example.projetcv.model.Person;
+import com.example.projetcv.model.User;
 import com.example.projetcv.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
@@ -56,8 +56,8 @@ public class AuthenticationController {
      * Ajouter un utilisateur
      */
     @PostMapping("/signup")
-    public String signup(@RequestBody Person user) {
-        return userService.signup(modelMapper.map(user, Person.class));
+    public String signup(@RequestBody User user) {
+        return userService.signup(modelMapper.map(user, User.class));
     }
 
 
@@ -76,8 +76,8 @@ public class AuthenticationController {
      */
     @GetMapping(value = "/me")
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
-    public Person whoami(HttpServletRequest req) {
-        return modelMapper.map(userService.whoami(req), Person.class);
+    public User whoami(HttpServletRequest req) {
+        return modelMapper.map(userService.whoami(req), User.class);
     }
 
 
@@ -100,8 +100,8 @@ public class AuthenticationController {
      */
     @GetMapping("/{username}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public Person search(@PathVariable String username) {
-        return modelMapper.map(userService.search(username), Person.class);
+    public User search(@PathVariable String username) {
+        return modelMapper.map(userService.search(username), User.class);
     }
 
 
