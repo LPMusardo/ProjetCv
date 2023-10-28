@@ -37,11 +37,11 @@ public class UserRepositoryTest {
                 .email("anemail@email.com")
                 .passwordHash("lehash")
                 .build();
-        User saveduser = userRepository.save(user);
-        logger.info("saveduser: " + saveduser);
+        User savedUser = userRepository.save(user);
+        logger.info("savedUser: " + savedUser);
 
-        assertThat(saveduser).isNotNull();
-        assertThat(saveduser.getId()).isNotNull();
+        assertThat(savedUser).isNotNull();
+        assertThat(savedUser.getId()).isNotNull();
     }
 
     @Test
@@ -53,11 +53,11 @@ public class UserRepositoryTest {
                 .email("anemail@email.com")
                 .passwordHash("lehash")
                 .build();
-        User saveduser = userRepository.save(user);
-        Optional<User> founduser = userRepository.findById(saveduser.getId());
+        User savedUser = userRepository.save(user);
+        Optional<User> founduser = userRepository.findById(savedUser.getId());
 
         assertThat(founduser).isPresent();
-        assertThat(founduser.get().getName()).isEqualTo(saveduser.getName());
+        assertThat(founduser.get().getName()).isEqualTo(savedUser.getName());
     }
 
 
@@ -97,11 +97,11 @@ public class UserRepositoryTest {
                 .email("anemail@email.com")
                 .passwordHash("lehash")
                 .build();
-        User saveduser = userRepository.save(user);
-        userRepository.deleteById(saveduser.getId());
-        Optional<User> founduser = userRepository.findById(saveduser.getId());
+        User savedUser = userRepository.save(user);
+        userRepository.deleteById(savedUser.getId());
+        Optional<User> foundUser = userRepository.findById(savedUser.getId());
 
-        assertThat(founduser).isNotPresent();
+        assertThat(foundUser).isNotPresent();
     }
 
 

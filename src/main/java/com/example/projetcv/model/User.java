@@ -1,5 +1,6 @@
 package com.example.projetcv.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,9 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+/*
+* En utilisant @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}), vous dites à Jackson d'ignorer ces champs spécifiques lors de la conversion en JSON. Ces champs sont spécifiques à Hibernate et ne contiennent pas de données que vous souhaiteriez renvoyer via votre API, il est donc généralement sûr de les ignorer.*/
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class User {
 
 

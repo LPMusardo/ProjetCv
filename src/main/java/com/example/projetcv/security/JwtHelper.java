@@ -15,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Base64;
@@ -89,8 +90,9 @@ public class JwtHelper {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get("mail",String.class);
     }
 
-    public String getId(String token) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get("id",String.class);
+
+    public Long getId(String token) {
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get("id",Long.class);
     }
 
 

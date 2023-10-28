@@ -15,6 +15,9 @@ import java.util.List;
 @Transactional
 public interface CVRepository extends JpaRepository<CV, Long> {
 
+    void deleteByUserId(Long userId);
+    CV findByUserId(Long userId);
+
 
 /*    @Query("SELECT cv FROM CV cv JOIN cv.activities a WHERE a.nature = :nature")
     List<CV> findCvWithActivitesOfNature(@Param("nature") Nature nature);*/

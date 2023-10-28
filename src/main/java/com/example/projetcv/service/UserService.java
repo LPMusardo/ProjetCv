@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import jakarta.servlet.http.HttpServletRequest;
@@ -64,7 +65,7 @@ public class UserService {
         userRepository.deleteByEmail(email);
     }
 
-    public User search(String email) {
+    private User search(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new MyJwtException("The user doesn't exist", HttpStatus.NOT_FOUND));
     }
@@ -77,12 +78,23 @@ public class UserService {
         return jwtTokenProvider.createToken(userRepository.findByEmail(email).get());
     }
 
+
     public User update(User user) {
         return userRepository.save(user);
     }
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    public User getUserById(Long id){
+
+         return userRepository.findById(id).orElseThrow(()-> new UsernameNotFoundException("Id " + id + "not found"));
+    }
+
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(()-> new UsernameNotFoundException("Email " + email + "not found"));
+
     }
 
 
