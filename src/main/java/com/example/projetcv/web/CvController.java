@@ -34,13 +34,13 @@ public class CvController {
         return cvService.getCvById(id);
 
     }
-
-    @DeleteMapping
+// TODO :
+/*    @DeleteMapping
     public String deleteCv() {
         Long idUser = jwtTokenProvider.getId(jwtTokenProvider.resolveToken(req));
         cvService.deleteCvByUserId(idUser);
         return "You deleted  your Cv with id : " + idUser;
-    }
+    }*/
 
     @PostMapping
     public String addActivity(HttpServletRequest req,@RequestBody Activity activity){
