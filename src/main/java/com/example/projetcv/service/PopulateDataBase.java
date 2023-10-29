@@ -26,7 +26,7 @@ public class PopulateDataBase implements CommandLineRunner {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    private Random random = new Random();
+    private Random random = new Random(42);
     Faker faker = new Faker(new Locale("fr", "FR"), new Random(42));
 
 
@@ -91,7 +91,7 @@ public class PopulateDataBase implements CommandLineRunner {
     }
 
 
-    public int randomInt(int min, int max) {
+    private int randomInt(int min, int max) {
         return random.nextInt(max - min + 1) + min;
     }
 
