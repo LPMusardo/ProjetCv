@@ -1,27 +1,22 @@
 package com.example.projetcv.web;
 
+import com.example.projetcv.dto.UserSignupDto;
 import com.example.projetcv.model.User;
 import com.example.projetcv.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.logging.Logger;
 
 
 @RestController
 @RequestMapping("/api/auth")
-@Profile("usejwt")
 public class AuthenticationController {
 
     @Autowired
@@ -33,18 +28,17 @@ public class AuthenticationController {
 
     //-----------------------------------------------------------------------------------
 
-
     /**
      * Authentification et récupération d'un JWT
      */
     @PostMapping("/login")
-    public String login(@RequestParam String username, @RequestParam String password) {
-        logger.info("login: " + username + " " + password);
-        return userService.login(username, password);
+    public String login(@RequestParam String email, @RequestParam String password) {
+        return userService.login(email, password);
     }
 
+
     /**
-     * Ajoutez une entrée GET /logout qui permet d'oublier le JWT en question.
+     * Supprimer le JWT de la whitelist
      */
     @GetMapping("/logout")
     public String logout(HttpServletRequest req) {
@@ -52,22 +46,13 @@ public class AuthenticationController {
     }
 
 
-    /**
-     * Ajouter un utilisateur
-     */
-    @PostMapping("/signup")
-    public String signup(@RequestBody User user) {
-        return userService.signup(modelMapper.map(user, User.class));
-    }
-
 
     /**
      * Récupérer un nouveau JWT
      */
     @GetMapping("/refresh")
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     public String refresh(HttpServletRequest req) {
-        return userService.refresh(req.getRemoteUser());
+        return userService.refresh(req);
     }
 
 
@@ -76,35 +61,9 @@ public class AuthenticationController {
      */
     @GetMapping(value = "/me")
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
-    public User whoami(HttpServletRequest req) {
-        return modelMapper.map(userService.whoami(req), User.class);
+    public User whoami(@AuthenticationPrincipal UserDetails userDetails) {
+        return userService.whoami(userDetails);
     }
-
-
-
-    //-----------------------------------------------------------------------------------
-    // TODO: Déplacer dans le controlleur adapté
-    /**
-     * Supprimer un utilisateur
-     */
-    @DeleteMapping("/{username}")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public String delete(@PathVariable String username) {
-        System.out.println("delete " + username);
-        userService.delete(username);
-        return username;
-    }
-
-    /**
-     * Récupérer des informations sur un utilisateur
-     */
-    @GetMapping("/{username}")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public User search(@PathVariable String username) {
-        return modelMapper.map(userService.search(username), User.class);
-    }
-
-
 
 
 
