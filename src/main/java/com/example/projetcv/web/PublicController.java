@@ -6,6 +6,8 @@ import com.example.projetcv.model.User;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,19 +28,17 @@ public class PublicController {
     UserRepository userRepository;
 
 
-
+    //-----------------------------------------------------------------------------
 
     @GetMapping("/test")
-    public String refresh(HttpServletRequest req) {
-        return "Vous etes public";
+    public String refresh(@AuthenticationPrincipal UserDetails userDetails) {
+        return "You are: " + ((userDetails==null)? "[]":userDetails.getAuthorities());
     }
 
-    @GetMapping("/users")
-    public List<User> users(HttpServletRequest req) {
-        return userRepository.findAll();
+    @GetMapping("/hello")
+    public String helloWorld() {
+        return "Hello, World!";
     }
-
-
 
 
 }
