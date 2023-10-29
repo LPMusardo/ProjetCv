@@ -1,7 +1,6 @@
 package com.example.projetcv.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,36 +12,38 @@ import lombok.*;
 @Builder
 public class Activity {
 
-  @JsonView(Views.Internal.class)
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long id;
-  @JsonBackReference
-  @JsonView(Views.Internal.class)
-  @ToString.Exclude
-  @ManyToOne(optional=false)
-  @JoinColumn(nullable = false)
-  private CV cv;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    @JsonBackReference
 
-  @JsonView(Views.Public.class)
-  @Basic
-  private int year;
 
-  @JsonView(Views.Public.class)
-  @Basic
-  @Column(nullable = false)
-  private Nature nature;
+    @ToString.Exclude
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
+    private CV cv;
 
-  @JsonView(Views.Public.class)
-  @Basic
-  @Column(nullable = false)
-  private String title;
 
-  @JsonView(Views.Public.class)
-  @Basic
-  private String description;
+    @Basic
+    private int year;
 
-  @JsonView(Views.Public.class)
-  @Basic
-  private String webAddress;
+
+    @Basic
+    @Column(nullable = false)
+    private Nature nature;
+
+
+    @Basic
+    @Column(nullable = false)
+    private String title;
+
+
+    @Basic
+    private String description;
+
+
+    @Basic
+    private String webAddress;
+
+
 }

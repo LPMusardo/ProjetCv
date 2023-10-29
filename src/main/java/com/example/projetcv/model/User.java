@@ -1,13 +1,12 @@
 package com.example.projetcv.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonView;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import jakarta.persistence.*;
+
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -17,40 +16,38 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-/*
-* En utilisant @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}), vous dites à Jackson d'ignorer ces champs spécifiques lors de la conversion en JSON. Ces champs sont spécifiques à Hibernate et ne contiennent pas de données que vous souhaiteriez renvoyer via votre API, il est donc généralement sûr de les ignorer.*/
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class User {
 
 
-
+    @ElementCollection(fetch = FetchType.EAGER)
+    Set<String> roles;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @JsonView(com.example.projetcv.model.Views.Public.class)
+
     @Column(nullable = false)
     private String name;
 
-    @JsonView(Views.Public.class)
+
     @Column(nullable = false)
     private String firstName;
 
-    @JsonView(Views.Public.class)
+
     @Basic
-    @Column(unique=true, nullable = false)
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @JsonView(Views.Public.class)
+
     @Basic
     private String website;
 
-    @JsonView(Views.Internal.class)
+
     @Basic
     @Column(nullable = false)
     private LocalDate birthday;
 
-    @JsonView(Views.Internal.class)
+
     @Basic
     @Column(nullable = false)
     private String passwordHash;
@@ -61,11 +58,8 @@ public class User {
     //
     // mappedby est utilisé dans l'entité qui n'est pas le propriétaire de la relation et qui ne contient pas la clé étrangère
     @JsonManagedReference
-    @JsonView(Views.Public.class)
     @OneToOne(optional = true, mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private CV cv;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    Set<String> roles;
 
 }

@@ -8,12 +8,10 @@ public enum Nature {
     private static final Random random = new Random();
 
 
-    public static Nature randomNature()  {
+    public static Nature randomNature() {
         Nature[] natures = values();
         return natures[random.nextInt(natures.length)];
     }
-
-
 
 
 }
