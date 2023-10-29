@@ -1,24 +1,37 @@
 package com.example.projetcv.service;
 
 import com.example.projetcv.dao.UserRepository;
+import com.example.projetcv.dto.UserSignupDto;
+import com.example.projetcv.dto.UserUpdateDto;
+import com.example.projetcv.exception.MyJwtException;
+import com.example.projetcv.exception.NotFoundException;
 import com.example.projetcv.model.User;
 import com.example.projetcv.security.JwtHelper;
-import com.example.projetcv.security.MyJwtException;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Header;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwt;
+import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
+import org.modelmapper.Conditions;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 @Service
-@Profile("usejwt")
 public class UserService {
+
+    private Logger logger = Logger.getLogger(this.getClass().getName());
 
     @Autowired
     private UserRepository userRepository;
@@ -27,59 +40,84 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private JwtHelper jwtTokenProvider;
+    private JwtHelper jwtHelper;
 
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    public String login(String username, String password) {
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-            var user = userRepository.findByEmail(username).get();
-            return jwtTokenProvider.createToken(user);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return e.getMessage();
-            //throw new MyJwtException("Invalid username/password supplied", HttpStatus.UNPROCESSABLE_ENTITY);
-        }
+    private ModelMapper modelMapper;
+
+    //-----------------------------------------------------------------------------------
+
+
+    @PostConstruct
+    private void init(){
+        modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setSkipNullEnabled(true);
+
+        //
+        var typemape = modelMapper.createTypeMap(UserSignupDto.class, User.class);
+        typemape.addMapping(UserSignupDto::getPassword, User::setPasswordHash);
+        //
+
     }
+
+
+
+
+    //-----------------------------------------------------------------------------------
+
+
+    public String login(String email, String password) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User with mail'" + email + "' not found"));
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getId(), password));
+        return jwtHelper.createToken(user);
+    }
+
 
     public String logout(HttpServletRequest req) {
-        try {
-            return jwtTokenProvider.removeToken(jwtTokenProvider.resolveToken(req));
-        } catch (Exception e) {
-            throw new MyJwtException("Invalid token", HttpStatus.UNPROCESSABLE_ENTITY);
-        }
+        return jwtHelper.removeTokenFromWhiteList(jwtHelper.resolveToken(req));
     }
 
-    public String signup(User user) {
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+    public User signup(UserSignupDto userDTO) {
+        if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
             throw new MyJwtException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
         }
+        User user = modelMapper.map(userDTO, User.class);
         user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
-        userRepository.save(user);
-        return jwtTokenProvider.createToken(user);
+        return userRepository.save(user);
     }
 
-    public void delete(String email) {
-        userRepository.deleteByEmail(email);
+    public User deleteById(String id) {
+        User userToDelete = userRepository.findById(Long.parseLong(id)).orElseThrow(() -> new NotFoundException("The user of id"+ id +"doesn't exist", HttpStatus.NOT_FOUND));
+        userRepository.deleteById(Long.parseLong(id));
+        return userToDelete;
     }
 
-    private User search(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new MyJwtException("The user doesn't exist", HttpStatus.NOT_FOUND));
+    public User getUserById(long id) {
+        return userRepository.findById(id).orElseThrow(() -> new NotFoundException("The user of id"+ id +"doesn't exist", HttpStatus.NOT_FOUND));
     }
 
-    public User whoami(HttpServletRequest req) {
-        return search(jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(req)));
+    public User whoami(UserDetails userDetails) {
+        return getUserById(Long.parseLong(userDetails.getUsername()));
     }
 
-    public String refresh(String email) {
-        return jwtTokenProvider.createToken(userRepository.findByEmail(email).get());
+    public String refresh(HttpServletRequest req) {
+        String initialToken = jwtHelper.resolveToken(req);
+        String userId = jwtHelper.getUserId(initialToken);
+        User user = userRepository.findById(Long.parseLong(userId)).orElseThrow(()-> new MyJwtException("User from token not found in database", HttpStatus.UNAUTHORIZED));
+        String newToken = jwtHelper.createToken(user);
+        jwtHelper.removeTokenFromWhiteList(initialToken);
+        return newToken;
     }
 
 
-    public User update(User user) {
+    public User update(UserUpdateDto userUpdateDto, UserDetails userDetails) {
+        User user = userRepository.findById(Long.parseLong(userDetails.getUsername())).orElseThrow(() -> new UsernameNotFoundException("User with id'" + userDetails.getUsername() + "' not found"));
+        logger.info("user to update :\n" + user);
+        logger.info("user proposition :\n" + userUpdateDto);
+        modelMapper.map(userUpdateDto, user);
+        logger.info("user updated :\n" + user);
         return userRepository.save(user);
     }
 
@@ -87,15 +125,9 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public User getUserById(Long id){
-
-         return userRepository.findById(id).orElseThrow(()-> new UsernameNotFoundException("Id " + id + "not found"));
-    }
-
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(()-> new UsernameNotFoundException("Email " + email + "not found"));
-
-    }
+//    public Jwt<Header, Claims> getTokenInfo(String token) {
+//        return jwtHelper.getTokenInfo(token);
+//    }
 
 
 }
