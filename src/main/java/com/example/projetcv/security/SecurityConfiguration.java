@@ -28,7 +28,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @EnableWebSecurity
-@Profile("usejwt")
 @Configuration
 public class SecurityConfiguration {
 
@@ -41,40 +40,31 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.csrf(AbstractHttpConfigurer::disable);
 
-        // Pas de vérification CSRF (cross site request forgery)
-        http.csrf().disable();
-
-        // Spring security de doit gérer les sessions
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.sessionManagement(sess -> sess.sessionCreationPolicy((SessionCreationPolicy.STATELESS)));
 
         http.authenticationProvider(authenticationProvider());
 
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
-        // Déclaration des end-points
-        http.authorizeRequests().requestMatchers("/api/auth/login").permitAll()
-                .and()
-                .authorizeRequests().requestMatchers("/api/auth/signup").authenticated()
-                .and()
-                .authorizeRequests().requestMatchers("/api/auth/**").authenticated()
-                .and()
-                .authorizeRequests().requestMatchers("/api/admin/**").hasAuthority("ADMIN")
-                .and()
-                .authorizeRequests().requestMatchers(HttpMethod.GET,"/api/users/**").permitAll()
-                .and()
-                .authorizeRequests().requestMatchers(HttpMethod.DELETE, "/api/users").authenticated()
-                .and()
-                .authorizeRequests().requestMatchers(HttpMethod.PATCH, "/api/users").authenticated()
-                .and()
-                .authorizeRequests().requestMatchers(HttpMethod.POST, "/api/users").authenticated()
-                .anyRequest().permitAll();
+        http.authorizeHttpRequests(
+            auth -> auth
+                .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
+                //
+                .requestMatchers("/api/auth/login").permitAll()
+                .requestMatchers("/api/auth/**").authenticated()
+                //
+                .requestMatchers(HttpMethod.DELETE, "/api/users").authenticated()
+                .requestMatchers(HttpMethod.PATCH, "/api/users").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/users").authenticated()
+                //
+                .requestMatchers(HttpMethod.DELETE, "/api/cvs").authenticated()
+                //
+                .anyRequest().permitAll()
+            );
 
-        // Pas vraiment nécessaire
-        //http.exceptionHandling().accessDeniedPage("/login");
-
-        // Optional, if you want to test the API from a browser
-        //http.httpBasic();
+        //.cors();
 
         return http.build();
     }
