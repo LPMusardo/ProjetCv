@@ -19,6 +19,7 @@ public interface CVRepository extends JpaRepository<CV, Long> {
     CV findByUserId(Long userId);
 
 
+    // TODO: remove if useless
 /*    @Query("SELECT cv FROM CV cv JOIN cv.activities a WHERE a.nature = :nature")
     List<CV> findCvWithActivitesOfNature(@Param("nature") Nature nature);*/
 }
