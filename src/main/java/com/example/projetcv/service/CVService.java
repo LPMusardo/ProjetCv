@@ -8,13 +8,13 @@ import com.example.projetcv.model.CV;
 import com.example.projetcv.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-@Profile("usejwt")
 public class CVService {
 
     @Autowired
@@ -39,12 +39,13 @@ public class CVService {
         cvRepository.deleteByUserId(id);
     }
 
-    public void addActivityToCv(Long idUser, Activity activity) {
-        CV cv = cvRepository.findByUserId(idUser);
+    public void addActivityToCv(String idUser, Activity activity) {
+        long idUserLong = Long.parseLong(idUser);
+        CV cv = cvRepository.findByUserId(idUserLong);
 
         if (cv == null) cv = new CV();
 
-        User user = userService.getUserById(idUser);
+        User user = userService.getUserById(idUserLong);
         cv.setUser(user);
         if (cv.getActivities() == null) {
             cv.setActivities(List.of(activity));
@@ -55,11 +56,12 @@ public class CVService {
         cvRepository.save(cv);
     }
 
-    public void removeActivityToCv(Long idUser, Long activityId) {
-        CV cv = cvRepository.findByUserId(idUser);
-        if (cv == null) throw new NotFoundException("CV not found");
-        User user = userService.getUserById(idUser);
-        Activity activity = activityRepository.findById(activityId).orElseThrow(()-> new NotFoundException("Activity not found"));
+    public void removeActivityToCv(String idUser, Long activityId) {
+        long idUserLong = Long.parseLong(idUser);
+        CV cv = cvRepository.findByUserId(idUserLong);
+        if (cv == null) throw new NotFoundException("CV not found", HttpStatus.NOT_FOUND);
+        User user = userService.getUserById(idUserLong);
+        Activity activity = activityRepository.findById(activityId).orElseThrow(()-> new NotFoundException("Activity not found", HttpStatus.NOT_FOUND));
         cv.getActivities().remove(activity);
         cvRepository.save(cv);
     }
@@ -74,7 +76,7 @@ public class CVService {
                     activity.setYear(updatedActivity.getYear());
                     return activityRepository.save(activity);
                 })
-                .orElseThrow(() -> new NotFoundException("Activity not found with id " + id));
+                .orElseThrow(() -> new NotFoundException("Activity not found with id " + id, HttpStatus.NOT_FOUND));
     }
 
 
