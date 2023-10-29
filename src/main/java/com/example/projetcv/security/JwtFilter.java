@@ -1,5 +1,6 @@
 package com.example.projetcv.security;
 
+import com.example.projetcv.exception.MyJwtException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
@@ -37,7 +38,6 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         String token = jwtHelper.resolveToken(request);
-
         try {
             if (token != null && jwtHelper.validateToken(token)) {
                 Authentication auth = jwtHelper.getAuthentication(token);

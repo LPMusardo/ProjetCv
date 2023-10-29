@@ -12,17 +12,16 @@ import org.springframework.security.core.userdetails.User;
 
 
 @Service
-@Profile("usejwt")
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        var user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User '" + email + "' not found"));
+    public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
+        var user = userRepository.findById(Long.parseLong(id)).orElseThrow(() -> new UsernameNotFoundException("User '" + id + "' not found"));
         return User
-                .withUsername(email)
+                .withUsername(id)
                 .password(user.getPasswordHash())
                 .authorities(user.getRoles().stream().map(SimpleGrantedAuthority::new).toList())
                 .accountExpired(false)
