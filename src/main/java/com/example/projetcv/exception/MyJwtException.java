@@ -1,4 +1,4 @@
-package com.example.projetcv.security;
+package com.example.projetcv.exception;
 
 import org.springframework.http.HttpStatus;
 

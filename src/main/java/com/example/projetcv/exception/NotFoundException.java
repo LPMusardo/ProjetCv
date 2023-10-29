@@ -1,12 +1,18 @@
 package com.example.projetcv.exception;
 
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
+
+@Getter
 public class NotFoundException extends RuntimeException {
-    public NotFoundException(String message) {
+
+    private final HttpStatus httpStatus;
+
+    public NotFoundException(String message, HttpStatus httpStatus) {
         super(message);
+        this.httpStatus = httpStatus;
     }
 
-    // You can add additional constructors as needed
-    public NotFoundException(String message, Throwable cause) {
-        super(message, cause);
-    }
+
+
 }
