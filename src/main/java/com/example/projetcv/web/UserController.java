@@ -1,15 +1,14 @@
 package com.example.projetcv.web;
 
 
-import com.example.projetcv.dto.SafeUserDto;
+import com.example.projetcv.dto.UserSafeDto;
 import com.example.projetcv.dto.UserSignupDto;
 import com.example.projetcv.dto.UserUpdateDto;
-import com.example.projetcv.model.User;
 import com.example.projetcv.service.UserService;
 import jakarta.validation.Valid;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
@@ -30,45 +29,45 @@ public class UserController {
 
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
-    private ModelMapper modelMapper = new ModelMapper();
 
 
     //------------------------------------------------------------------------------
 
 
     @GetMapping
-    public PagedModel<SafeUserDto> getUsers( @RequestParam(defaultValue = "%") String name,
-                                             @RequestParam(defaultValue = "%") String firstName,
-                                             @RequestParam(defaultValue = "%") String activityTitle,
-                                             @PageableDefault(size = 5) Pageable pageable) {
+    public PagedModel<UserSafeDto> getUsers(@RequestParam(defaultValue = "%") String name,
+                                            @RequestParam(defaultValue = "%") String firstName,
+                                            @RequestParam(defaultValue = "%") String activityTitle,
+                                            @PageableDefault(page = 0, size = 5, direction = Direction.ASC, sort = {"name", "firstName"} ) Pageable pageable) {
         return userService.getAllUsersWithFilter(name, firstName, activityTitle, pageable);
     }
 
 
-
-
     @GetMapping("/{id}")
-    public SafeUserDto getUser(@PathVariable Long id) {
-        User user = userService.getUserById(id);
-        return modelMapper.map(user, SafeUserDto.class);
+    public UserSafeDto getUser(@PathVariable Long id) {
+        return userService.getUserById(id);
     }
+
 
     @DeleteMapping
-    public ResponseEntity<SafeUserDto> deleteUser(@AuthenticationPrincipal UserDetails userDetails) {
-        User userDeleted = userService.deleteById(userDetails.getUsername());
-        return new ResponseEntity<>(modelMapper.map(userDeleted, SafeUserDto.class), HttpStatus.NO_CONTENT);
+    public ResponseEntity<UserSafeDto> deleteUser(@AuthenticationPrincipal UserDetails userDetails) {
+        UserSafeDto userDeleted = userService.deleteById(userDetails.getUsername());
+        return new ResponseEntity<>(userDeleted, HttpStatus.NO_CONTENT);
     }
+
 
     @PostMapping()
-    public ResponseEntity<SafeUserDto> signup(@Valid @RequestBody UserSignupDto userDTO) {
-        User newUser = userService.signup(userDTO);
-        return new ResponseEntity<>(modelMapper.map(newUser, SafeUserDto.class), HttpStatus.CREATED);
+    public ResponseEntity<UserSafeDto> signup(@Valid @RequestBody UserSignupDto userDTO) {
+        UserSafeDto newUser = userService.signup(userDTO);
+        return new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
 
+
     @PatchMapping
-    public ResponseEntity<SafeUserDto> updateUser(@Valid @RequestBody UserUpdateDto userUpdateDto, @AuthenticationPrincipal UserDetails userDetails){
-        User userUpated = userService.update(userUpdateDto, userDetails);
-        return new ResponseEntity<>(modelMapper.map(userUpated, SafeUserDto.class), HttpStatus.ACCEPTED);
+    public ResponseEntity<UserSafeDto> updateUser(@Valid @RequestBody UserUpdateDto userUpdateDto, @AuthenticationPrincipal UserDetails userDetails){
+        UserSafeDto userUpated = userService.update(userUpdateDto, userDetails);
+        return new ResponseEntity<>(userUpated, HttpStatus.ACCEPTED);
     }
+
 
 }
