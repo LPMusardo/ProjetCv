@@ -1,10 +1,7 @@
 package com.example.projetcv.dto;
 
 import com.example.projetcv.model.CV;
-import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,14 +23,17 @@ public class UserSignupDto {
 
     @Email(message = "email must be correct")
     @NotNull(message = "email must not be null")
+    @NotBlank(message = "email must not be blank")
     private String email;
 
     private String website;
 
+    @NotNull(message = "birthday must not be null")
     private LocalDate birthday;
 
     @NotNull(message = "password must not be null")
     @NotBlank(message = "password must not be blank")
+    @Size(min = 2, message = "password must not be too short")
     private String password;
 
     @NotNull(message = "passwordConfirm must not be null")
