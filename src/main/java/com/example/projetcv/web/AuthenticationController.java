@@ -1,12 +1,10 @@
 package com.example.projetcv.web;
 
 import com.example.projetcv.dto.LoginDto;
-import com.example.projetcv.dto.UserSignupDto;
-import com.example.projetcv.model.User;
+import com.example.projetcv.dto.UserSafeDto;
 import com.example.projetcv.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,7 +23,6 @@ public class AuthenticationController {
 
     private Logger logger = Logger.getLogger(AuthenticationController.class.getName());
 
-    private ModelMapper modelMapper = new ModelMapper();
 
     //-----------------------------------------------------------------------------------
 
@@ -61,8 +58,7 @@ public class AuthenticationController {
      * Récupérer des informations sur l'utilisateur courant
      */
     @GetMapping(value = "/me")
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
-    public User whoami(@AuthenticationPrincipal UserDetails userDetails) {
+    public UserSafeDto whoami(@AuthenticationPrincipal UserDetails userDetails) {
         return userService.whoami(userDetails);
     }
 
