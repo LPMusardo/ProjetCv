@@ -12,7 +12,9 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 
 @Data
-public class SafeUserDto  extends  RepresentationModel<SafeUserDto>{
+public class UserSafeDto extends  RepresentationModel<UserSafeDto>{
+
+    private Long id;
 
     private String name;
 
@@ -28,15 +30,15 @@ public class SafeUserDto  extends  RepresentationModel<SafeUserDto>{
 
 
     @Component
-    public static class SafeUserDtoAssembler extends RepresentationModelAssemblerSupport<User, SafeUserDto> {
+    public static class SafeUserDtoAssembler extends RepresentationModelAssemblerSupport<User, UserSafeDto> {
         public SafeUserDtoAssembler() {
-            super(UserController.class, SafeUserDto.class);
+            super(UserController.class, UserSafeDto.class);
         }
 
         @Override
-        public SafeUserDto toModel(User entity) {
+        public UserSafeDto toModel(User entity) {
             ModelMapper modelMapper = new ModelMapper();
-            return modelMapper.map(entity, SafeUserDto.class);
+            return modelMapper.map(entity, UserSafeDto.class);
         }
     }
 
