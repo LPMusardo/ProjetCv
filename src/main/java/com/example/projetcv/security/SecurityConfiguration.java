@@ -60,6 +60,9 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.POST, "/api/users").authenticated()
                 //
                 .requestMatchers(HttpMethod.DELETE, "/api/cvs").authenticated()
+                .requestMatchers(HttpMethod.PATCH, "/api/cvs").authenticated()
+                //
+                .requestMatchers(HttpMethod.DELETE, "/api/activity").authenticated()
                 //
                 .anyRequest().permitAll()
             );
