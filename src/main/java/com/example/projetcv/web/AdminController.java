@@ -6,13 +6,13 @@ import com.example.projetcv.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -41,8 +41,13 @@ public class AdminController {
     }
 
     @GetMapping("/users")
-    public List<User> getAllUsers(HttpServletRequest req) {
+    public SafeUserDto[] getAllUsers() {
         return userService.getAllUsers();
+    }
+
+   @GetMapping("/users/page")
+    public Object getPageUsers(@PageableDefault(page = 0, size = 5) Pageable pageable) {
+        return userService.getPageUsers(pageable);
     }
 
 
