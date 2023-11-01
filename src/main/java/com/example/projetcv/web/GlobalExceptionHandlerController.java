@@ -21,6 +21,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -73,6 +74,10 @@ public class GlobalExceptionHandlerController {
   public void handleAuthenticationException(HttpServletResponse res, AuthenticationException ex) throws IOException {
     res.sendError(HttpStatus.UNAUTHORIZED.value(), ex.getMessage());
   }
+  @ExceptionHandler(TransactionSystemException.class)
+  public void handleTransactionSystemException(HttpServletResponse res, TransactionSystemException ex) throws IOException {
+    res.sendError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+  }
 
   @ExceptionHandler(NumberFormatException .class)
   public void handleNumberFormatException(HttpServletResponse res, NumberFormatException ex) throws IOException {
@@ -82,7 +87,7 @@ public class GlobalExceptionHandlerController {
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public void handleValidationErrors(HttpServletResponse res, MethodArgumentNotValidException ex) throws IOException {
     //List<String> errors = ex.getBindingResult().getFieldErrors().stream().map(FieldError::getDefaultMessage).collect(Collectors.toList());
-    res.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "ex.getMessage()");
+    res.sendError(HttpStatus.BAD_REQUEST.value(), "ex.getMessage()");
     //return new ResponseEntity<>(getErrorsMap(errors), new HttpHeaders(), HttpStatus.BAD_REQUEST);
   }
 
