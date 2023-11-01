@@ -1,5 +1,6 @@
 package com.example.projetcv.web;
 
+import com.example.projetcv.dto.LoginDto;
 import com.example.projetcv.dto.UserSignupDto;
 import com.example.projetcv.model.User;
 import com.example.projetcv.service.UserService;
@@ -32,8 +33,8 @@ public class AuthenticationController {
      * Authentification et récupération d'un JWT
      */
     @PostMapping("/login")
-    public String login(@RequestParam String email, @RequestParam String password) {
-        return userService.login(email, password);
+    public String login(@Valid @RequestBody LoginDto loginDto) {
+        return userService.login(loginDto);
     }
 
 
