@@ -15,8 +15,8 @@ import java.util.List;
 @Transactional
 public interface CVRepository extends JpaRepository<CV, Long> {
 
-    void deleteByUserId(Long userId);
-    CV findByUserId(Long userId);
+    //void deleteByUserId(Long userId);
+    //CV findByUserId(Long userId);
 
 
     // TODO: remove if useless
