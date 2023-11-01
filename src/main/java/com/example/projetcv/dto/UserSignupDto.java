@@ -32,12 +32,12 @@ public class UserSignupDto {
 
     private LocalDate birthday;
 
-    @NotNull
-    @NotBlank
+    @NotNull(message = "password must not be null")
+    @NotBlank(message = "password must not be blank")
     private String password;
 
-    @NotNull
-    @NotBlank
+    @NotNull(message = "passwordConfirm must not be null")
+    @NotBlank(message = "passwordConfirm must not be blank")
     private String passwordConfirm;
 
     @AssertTrue(message = "Password and password confirmation must match")
