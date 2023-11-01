@@ -2,6 +2,7 @@ package com.example.projetcv.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 
@@ -15,9 +16,9 @@ public class Activity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+
     @JsonBackReference
-
-
     @ToString.Exclude
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
@@ -35,10 +36,11 @@ public class Activity {
 
     @Basic
     @Column(nullable = false)
+    @NotBlank(message = "title must not be blank")
     private String title;
 
 
-    @Basic
+    @Column(columnDefinition = "CLOB")
     private String description;
 
 
