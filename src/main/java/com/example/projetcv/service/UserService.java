@@ -1,21 +1,19 @@
 package com.example.projetcv.service;
 
 import com.example.projetcv.dao.UserRepository;
-import com.example.projetcv.dto.UserSignupDto;
-import com.example.projetcv.dto.UserUpdateDto;
+import com.example.projetcv.dto.*;
 import com.example.projetcv.exception.MyJwtException;
 import com.example.projetcv.exception.NotFoundException;
 import com.example.projetcv.model.User;
 import com.example.projetcv.security.JwtHelper;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Header;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwt;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
-import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,9 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
 
-import java.util.List;
 import java.util.logging.Logger;
 
 @Service
@@ -63,14 +59,12 @@ public class UserService {
     }
 
 
-
-
     //-----------------------------------------------------------------------------------
 
 
-    public String login(String email, String password) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User with mail'" + email + "' not found"));
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getId(), password));
+    public String login(LoginDto loginDto) {
+        User user = userRepository.findByEmail(loginDto.getEmail()).orElseThrow(() -> new UsernameNotFoundException("User with mail'" + loginDto.getEmail() + "' not found"));
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getId(), loginDto.getPassword()));
         return jwtHelper.createToken(user);
     }
 
@@ -78,6 +72,7 @@ public class UserService {
     public String logout(HttpServletRequest req) {
         return jwtHelper.removeTokenFromWhiteList(jwtHelper.resolveToken(req));
     }
+
 
     public User signup(UserSignupDto userDTO) {
         if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
@@ -88,19 +83,23 @@ public class UserService {
         return userRepository.save(user);
     }
 
+
     public User deleteById(String id) {
         User userToDelete = userRepository.findById(Long.parseLong(id)).orElseThrow(() -> new NotFoundException("The user of id"+ id +"doesn't exist", HttpStatus.NOT_FOUND));
         userRepository.deleteById(Long.parseLong(id));
         return userToDelete;
     }
 
+
     public User getUserById(long id) {
         return userRepository.findById(id).orElseThrow(() -> new NotFoundException("The user of id"+ id +"doesn't exist", HttpStatus.NOT_FOUND));
     }
 
+
     public User whoami(UserDetails userDetails) {
         return getUserById(Long.parseLong(userDetails.getUsername()));
     }
+
 
     public String refresh(HttpServletRequest req) {
         String initialToken = jwtHelper.resolveToken(req);
@@ -121,13 +120,31 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+
+    public SafeUserDto[] getAllUsers() {
+        return new ModelMapper().map(userRepository.findAll(), SafeUserDto[].class);
     }
 
-//    public Jwt<Header, Claims> getTokenInfo(String token) {
-//        return jwtHelper.getTokenInfo(token);
-//    }
+    public PagedModel<SafeUserDto> getAllUsersWithFilter(String name, String firstName, String activityTitle, Pageable pageable) {
+        Page<User> userPage = userRepository.findAllUsersWithFilters(name, firstName, activityTitle, pageable);
+        PagedModel<SafeUserDto> userPageHateoas = pagedResourcesAssembler.toModel(userPage, safeUserModelAssembler);
+        return userPageHateoas;
+    }
+
+
+    @Autowired
+    SafeUserDto.SafeUserDtoAssembler safeUserModelAssembler;
+
+    @Autowired
+    PagedResourcesAssembler<User> pagedResourcesAssembler;
+
+    public PagedModel<SafeUserDto> getPageUsers(Pageable pageable) {
+        Page<User> userPage = userRepository.findAll(pageable);
+        PagedModel<SafeUserDto> result = pagedResourcesAssembler.toModel(userPage, safeUserModelAssembler);
+        return result;
+
+    }
+
 
 
 }
