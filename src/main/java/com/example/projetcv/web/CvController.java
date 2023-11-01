@@ -1,17 +1,15 @@
 package com.example.projetcv.web;
 
-import com.example.projetcv.model.Activity;
+import com.example.projetcv.dto.CvDto;
+import com.example.projetcv.dto.SafeUserDto;
 import com.example.projetcv.model.CV;
-import com.example.projetcv.security.JwtHelper;
 import com.example.projetcv.service.CVService;
 import com.example.projetcv.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -26,9 +24,9 @@ public class CvController {
     @Autowired
     private UserService userService;
 
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
-    private ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper = new ModelMapper();
 
     @Autowired
     private CVService cvService;
@@ -36,23 +34,32 @@ public class CvController {
 
     //-----------------------------------------------------------------------
 
+
     @GetMapping
     public List<CV> getAllCvs() {
         return cvService.getAllCv();
     }
 
+
     @GetMapping("/{id}")
     public CV getCv(@PathVariable long id) {
         return cvService.getCvById(id);
-
     }
 
 
-/*    @DeleteMapping
+    @DeleteMapping
     public ResponseEntity<String> deleteCv(@AuthenticationPrincipal UserDetails userDetails) {
         cvService.deleteCvByUserId(userDetails.getUsername());
-        return new ResponseEntity<>("You deleted  your Cv with id : " + userDetails.getUsername(), HttpStatus.NO_CONTENT);
-    }*/
+        return new ResponseEntity<>("CV deleted", HttpStatus.NO_CONTENT);
+    }
+
+
+    @PatchMapping()
+    public ResponseEntity<SafeUserDto> updateCv(@Valid @RequestBody CvDto cvDto, @AuthenticationPrincipal UserDetails userDetails){
+        logger.info("from controller from updateCv()");
+        SafeUserDto userWithUpdatedCv = modelMapper.map(cvService.updateCV(cvDto, userDetails), SafeUserDto.class);
+        return new ResponseEntity<>(userWithUpdatedCv, HttpStatus.CREATED);
+    }
 
 
 /*    @PostMapping
@@ -60,21 +67,16 @@ public class CvController {
     public String addActivity(@AuthenticationPrincipal UserDetails userDetails, @RequestBody Activity activity){
         cvService.addActivityToCv(userDetails.getUsername() , activity);
         return "activity added";
-    }*/
+}*/
 
-/*    @PatchMapping("/{idActivity}")
-    public Activity updateCv(@PathVariable Long idActivity, @RequestBody Activity activity){
-        return  cvService.updateActivity(idActivity , activity);
 
-    }*/
 
 /*    @DeleteMapping
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     public String deleteActivity(@AuthenticationPrincipal UserDetails userDetails, Long idActivity){
         cvService.removeActivityToCv(userDetails.getUsername(),idActivity);
         return "";
-
-    }*/
+}*/
 
 
 
