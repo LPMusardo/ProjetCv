@@ -5,21 +5,19 @@ import com.example.projetcv.dto.SafeUserDto;
 import com.example.projetcv.dto.UserSignupDto;
 import com.example.projetcv.dto.UserUpdateDto;
 import com.example.projetcv.model.User;
-import com.example.projetcv.security.JwtHelper;
 import com.example.projetcv.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -37,11 +35,16 @@ public class UserController {
 
     //------------------------------------------------------------------------------
 
+
     @GetMapping
-    public SafeUserDto[] getAllUsers(HttpServletRequest req) {
-        List<User> users = userService.getAllUsers();
-        return modelMapper.map(users, SafeUserDto[].class);
+    public PagedModel<SafeUserDto> getUsers( @RequestParam(defaultValue = "%") String name,
+                                             @RequestParam(defaultValue = "%") String firstName,
+                                             @RequestParam(defaultValue = "%") String activityTitle,
+                                             @PageableDefault(size = 5) Pageable pageable) {
+        return userService.getAllUsersWithFilter(name, firstName, activityTitle, pageable);
     }
+
+
 
 
     @GetMapping("/{id}")
