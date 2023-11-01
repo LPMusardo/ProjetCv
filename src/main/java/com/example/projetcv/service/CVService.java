@@ -2,20 +2,29 @@ package com.example.projetcv.service;
 
 import com.example.projetcv.dao.ActivityRepository;
 import com.example.projetcv.dao.CVRepository;
-import com.example.projetcv.exception.NotFoundException;
+import com.example.projetcv.dao.UserRepository;
+import com.example.projetcv.dto.CvDto;
 import com.example.projetcv.model.Activity;
 import com.example.projetcv.model.CV;
 import com.example.projetcv.model.User;
+import jakarta.annotation.PostConstruct;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import java.util.logging.Logger;
 
 @Service
 public class CVService {
+
+    private Logger logger = Logger.getLogger(this.getClass().getName());
+
+    @Autowired
+    UserRepository userRepository;
 
     @Autowired
     CVRepository cvRepository;
@@ -26,6 +35,18 @@ public class CVService {
     @Autowired
     UserService userService;
 
+    ModelMapper modelMapper;
+
+    //------------------------------------------------------------------------------
+
+    @PostConstruct
+    private void init(){
+        this.modelMapper = new ModelMapper();
+    }
+
+
+
+    //------------------------------------------------------------------------------
 
     public List<CV> getAllCv() {
         return cvRepository.findAll();
@@ -35,11 +56,36 @@ public class CVService {
         return cvRepository.findById(id).get();
     }
 
-    public void deleteCvByUserId(Long id) {
-        cvRepository.deleteByUserId(id);
+    public void deleteCvByUserId(String id) {
+        cvRepository.deleteById(Long.parseLong(id));
     }
 
-    public void addActivityToCv(String idUser, Activity activity) {
+
+
+
+    public User updateCV(CvDto cvDto, UserDetails userDetails){
+        logger.info("Beginning update...");
+        User user = userRepository.findById(Long.parseLong(userDetails.getUsername())).orElseThrow(() -> new UsernameNotFoundException("User with id'" + userDetails.getUsername() + "' not found"));
+        logger.info("Cv initial : " + user.getCv());
+        logger.info("Cv proposition : " + cvDto);
+        List<Activity> newActivities = Arrays.asList(modelMapper.map(cvDto.getActivities(), Activity[].class));
+        newActivities.forEach(activity -> activity.setCv(user.getCv()));
+        user.getCv().getActivities().clear();
+        user.getCv().getActivities().addAll(newActivities);
+        User userUpdated = userRepository.save(user);
+        logger.info("Cv updated : " + userUpdated.getCv());
+
+        return userUpdated;
+    }
+
+
+
+
+
+
+
+
+/*    public void addActivityToCv(String idUser, Activity activity) {
         long idUserLong = Long.parseLong(idUser);
         CV cv = cvRepository.findByUserId(idUserLong);
 
@@ -54,8 +100,9 @@ public class CVService {
         }
 
         cvRepository.save(cv);
-    }
+    }*/
 
+/*
     public void removeActivityToCv(String idUser, Long activityId) {
         long idUserLong = Long.parseLong(idUser);
         CV cv = cvRepository.findByUserId(idUserLong);
@@ -65,8 +112,9 @@ public class CVService {
         cv.getActivities().remove(activity);
         cvRepository.save(cv);
     }
+*/
 
-    public Activity updateActivity(Long id, Activity updatedActivity) {
+/*    public Activity updateActivity(Long id, Activity updatedActivity) {
         return activityRepository.findById(id)
                 .map(activity -> {
                     activity.setDescription(updatedActivity.getDescription());
@@ -77,7 +125,7 @@ public class CVService {
                     return activityRepository.save(activity);
                 })
                 .orElseThrow(() -> new NotFoundException("Activity not found with id " + id, HttpStatus.NOT_FOUND));
-    }
+    }*/
 
 
 }
