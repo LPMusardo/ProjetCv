@@ -2,20 +2,24 @@ package com.example.projetcv.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.Constraint;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Check;
 
 import java.time.LocalDate;
 import java.util.Set;
 
 
-@Entity
+@Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Entity
 public class User {
 
 
@@ -27,15 +31,18 @@ public class User {
 
 
     @Column(nullable = false)
+    @Size(min = 2, message = "name is to short")
     private String name;
 
 
     @Column(nullable = false)
+    @Size(min = 2, message = "firstName is to short")
     private String firstName;
 
 
     @Basic
     @Column(unique = true, nullable = false)
+    @NotBlank(message = "email must not be blank in db")
     private String email;
 
 
