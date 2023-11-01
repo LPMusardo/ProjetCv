@@ -34,7 +34,7 @@ public class PopulateDataBase implements CommandLineRunner {
     public void run(String... args) throws Exception {
         clearDb();
         generateCustomUsers();
-        generateRandomUsers(10);
+        generateRandomUsers(100);
     }
 
     private void clearDb() {
@@ -50,14 +50,14 @@ public class PopulateDataBase implements CommandLineRunner {
             String pLastName = stripAccents(faker.name().lastName());
 
             // required
-            var user = User.builder().name(pFirstName).firstName(pLastName).birthday(LocalDate.ofEpochDay(randomInt(0, 1003502741))) //2001
+            var user = User.builder().name(pFirstName).firstName(pLastName).birthday(LocalDate.ofYearDay(randomInt(1950,2001), randomInt(1,365)))
                     .email(faker.internet().emailAddress(pFirstName.toLowerCase() + i)).passwordHash(hash).website(pFirstName + "." + pLastName + ".com").build();
             // optional
             if (i % 2 == 0) {
                 user.setRoles(Set.of("USER"));
             }
             if (i % 10 != 0) {
-                CV cv = generateCv(user);
+                CV cv = generateRandomCv(user);
                 user.setCv(cv);
             }
 
@@ -66,7 +66,7 @@ public class PopulateDataBase implements CommandLineRunner {
 
     }
 
-    private CV generateCv(User user) {
+    private CV generateRandomCv(User user) {
         CV cv = CV.builder().user(user).build();
         int nbActivities = randomInt(1, 3);
         List<Activity> activities = new ArrayList<>(nbActivities);
