@@ -29,13 +29,14 @@ public class JwtHelper {
 
     private Logger logger = Logger.getLogger(JwtHelper.class.getName());
 
-    public ArrayList<String> whiteList = new ArrayList<>();
+    @Autowired
+    JwtWhitelist whitelist;
 
 
-    @Value("${security.jwt.token.secret-key}")
+    @Value("${security.jwt.token.secret-key:SaS7FS7dvnMP1RwJT/zcTmLAUd07vICgJTzpB1MFtnY=}")
     private String secretKey;
 
-    @Value("${security.jwt.token.expire-length}")
+    @Value("${security.jwt.token.expire-length:6000000}")
     private long validityInMilliseconds;
 
     @Autowired
@@ -62,7 +63,7 @@ public class JwtHelper {
                 .setExpiration(validity)//
                 .signWith(SignatureAlgorithm.HS256, secretKey)//
                 .compact();
-        whiteList.add(token);
+        whitelist.addToken(token);
         logger.info("token created " + token);
         return token;
     }
@@ -98,7 +99,7 @@ public class JwtHelper {
             logger.info("Invalid or expired token");
             throw new MyJwtException("Invalid or expired token", HttpStatus.UNAUTHORIZED);
         }
-        if (!whiteList.contains(token)) {
+        if (!whitelist.containsToken(token)) {
             logger.info("Invalid or expired token");
             throw new MyJwtException("Invalid or expired token", HttpStatus.UNAUTHORIZED);
         }
@@ -109,21 +110,12 @@ public class JwtHelper {
 
 
     public String removeTokenFromWhiteList(String token) {
-        whiteList.remove(token);
+        whitelist.removeToken(token);
         return "token removed " + token;
     }
 
 
-    public void cleanWhiteList() {
-        for (int i = 0; i < whiteList.size(); i++) {
-            try {
-                Jwts.parser().setSigningKey(secretKey).parseClaimsJws(whiteList.get(i)).getBody().getExpiration();
-            } catch (Exception e) {
-                whiteList.remove(i);
-            }
-        }
-        logger.info("whitelist size: " + whiteList.size());
-    }
+
 
 
 //    public Jwt<Header, Claims> getTokenInfo(String token) {
