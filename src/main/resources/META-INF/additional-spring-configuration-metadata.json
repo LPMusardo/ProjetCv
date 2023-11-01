@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "com.example.projetcv.jwt.use-whitelist",
+      "type": "java.lang.Boolean",
+      "description": "whether to use whitelist for validating JWT tokens or not."
+  }
+] }
