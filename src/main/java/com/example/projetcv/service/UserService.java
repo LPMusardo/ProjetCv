@@ -22,6 +22,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
 import java.util.logging.Logger;
 
 @Service
@@ -42,6 +43,12 @@ public class UserService {
     private AuthenticationManager authenticationManager;
 
     private ModelMapper modelMapper;
+
+    @Autowired
+    UserSafeDto.SafeUserDtoAssembler safeUserModelAssembler;
+
+    @Autowired
+    PagedResourcesAssembler<User> pagedResourcesAssembler;
 
     //-----------------------------------------------------------------------------------
 
@@ -74,29 +81,35 @@ public class UserService {
     }
 
 
-    public User signup(UserSignupDto userDTO) {
+    public UserSafeDto signup(UserSignupDto userDTO) {
+        logger.info("Beginning signup...");
+        logger.info("userDto : " + userDTO);
         if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
             throw new MyJwtException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
         }
-        User user = modelMapper.map(userDTO, User.class);
-        user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
-        return userRepository.save(user);
+        User newUser = modelMapper.map(userDTO, User.class);
+        newUser.setPasswordHash(passwordEncoder.encode(newUser.getPasswordHash()));
+        newUser.setRoles(Set.of("USER"));
+        logger.info("New User ready to be saved : " + newUser);
+        User savedUser = userRepository.save(newUser);
+        return modelMapper.map(savedUser, UserSafeDto.class);
     }
 
 
-    public User deleteById(String id) {
+    public UserSafeDto deleteById(String id) {
         User userToDelete = userRepository.findById(Long.parseLong(id)).orElseThrow(() -> new NotFoundException("The user of id"+ id +"doesn't exist", HttpStatus.NOT_FOUND));
         userRepository.deleteById(Long.parseLong(id));
-        return userToDelete;
+        return modelMapper.map(userToDelete, UserSafeDto.class);
     }
 
 
-    public User getUserById(long id) {
-        return userRepository.findById(id).orElseThrow(() -> new NotFoundException("The user of id"+ id +"doesn't exist", HttpStatus.NOT_FOUND));
+    public UserSafeDto getUserById(long id) {
+        User user  = userRepository.findById(id).orElseThrow(() -> new NotFoundException("The user of id"+ id +"doesn't exist", HttpStatus.NOT_FOUND));
+        return modelMapper.map(user, UserSafeDto.class);
     }
 
 
-    public User whoami(UserDetails userDetails) {
+    public UserSafeDto whoami(UserDetails userDetails) {
         return getUserById(Long.parseLong(userDetails.getUsername()));
     }
 
@@ -111,38 +124,26 @@ public class UserService {
     }
 
 
-    public User update(UserUpdateDto userUpdateDto, UserDetails userDetails) {
+    public UserSafeDto update(UserUpdateDto userUpdateDto, UserDetails userDetails) {
         User user = userRepository.findById(Long.parseLong(userDetails.getUsername())).orElseThrow(() -> new UsernameNotFoundException("User with id'" + userDetails.getUsername() + "' not found"));
         logger.info("user to update :\n" + user);
         logger.info("user proposition :\n" + userUpdateDto);
         modelMapper.map(userUpdateDto, user);
         logger.info("user updated :\n" + user);
-        return userRepository.save(user);
+        User userUpdated = userRepository.save(user);
+        return modelMapper.map(userUpdated, UserSafeDto.class);
     }
 
 
-    public SafeUserDto[] getAllUsers() {
-        return new ModelMapper().map(userRepository.findAll(), SafeUserDto[].class);
+    public UserSafeDto[] getAllUsers() {
+        return new ModelMapper().map(userRepository.findAll(), UserSafeDto[].class);
     }
 
-    public PagedModel<SafeUserDto> getAllUsersWithFilter(String name, String firstName, String activityTitle, Pageable pageable) {
+
+    public PagedModel<UserSafeDto> getAllUsersWithFilter(String name, String firstName, String activityTitle, Pageable pageable) {
         Page<User> userPage = userRepository.findAllUsersWithFilters(name, firstName, activityTitle, pageable);
-        PagedModel<SafeUserDto> userPageHateoas = pagedResourcesAssembler.toModel(userPage, safeUserModelAssembler);
+        PagedModel<UserSafeDto> userPageHateoas = pagedResourcesAssembler.toModel(userPage, safeUserModelAssembler);
         return userPageHateoas;
-    }
-
-
-    @Autowired
-    SafeUserDto.SafeUserDtoAssembler safeUserModelAssembler;
-
-    @Autowired
-    PagedResourcesAssembler<User> pagedResourcesAssembler;
-
-    public PagedModel<SafeUserDto> getPageUsers(Pageable pageable) {
-        Page<User> userPage = userRepository.findAll(pageable);
-        PagedModel<SafeUserDto> result = pagedResourcesAssembler.toModel(userPage, safeUserModelAssembler);
-        return result;
-
     }
 
 
