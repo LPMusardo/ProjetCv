@@ -29,7 +29,10 @@ public class JwtHelper {
 
     private Logger logger = Logger.getLogger(JwtHelper.class.getName());
 
-    @Autowired
+    @Value("${com.example.projetcv.jwt.use-whitelist}")
+    private boolean useWhitelist;
+
+    @Autowired(required = false)
     JwtWhitelist whitelist;
 
 
@@ -63,7 +66,7 @@ public class JwtHelper {
                 .setExpiration(validity)//
                 .signWith(SignatureAlgorithm.HS256, secretKey)//
                 .compact();
-        whitelist.addToken(token);
+        if(useWhitelist) whitelist.addToken(token);
         logger.info("token created " + token);
         return token;
     }
@@ -99,7 +102,7 @@ public class JwtHelper {
             logger.info("Invalid or expired token");
             throw new MyJwtException("Invalid or expired token", HttpStatus.UNAUTHORIZED);
         }
-        if (!whitelist.containsToken(token)) {
+        if (useWhitelist && !whitelist.containsToken(token)) {
             logger.info("Invalid or expired token");
             throw new MyJwtException("Invalid or expired token", HttpStatus.UNAUTHORIZED);
         }
@@ -110,7 +113,7 @@ public class JwtHelper {
 
 
     public String removeTokenFromWhiteList(String token) {
-        whitelist.removeToken(token);
+        if(useWhitelist) whitelist.removeToken(token);
         return "token removed " + token;
     }
 
