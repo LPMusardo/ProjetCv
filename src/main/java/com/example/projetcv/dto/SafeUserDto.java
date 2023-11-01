@@ -1,29 +1,23 @@
 package com.example.projetcv.dto;
 
 import com.example.projetcv.model.CV;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
+import com.example.projetcv.model.User;
+import com.example.projetcv.web.UserController;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class SafeUserDto {
+public class SafeUserDto  extends  RepresentationModel<SafeUserDto>{
 
-    @NotNull
-    @NotBlank
     private String name;
 
-    @NotNull
-    @NotBlank
     private String firstName;
 
-    @Email
     private String email;
 
     private String website;
@@ -31,6 +25,23 @@ public class SafeUserDto {
     private LocalDate birthday;
 
     private CV cv;
+
+
+    @Component
+    public static class SafeUserDtoAssembler extends RepresentationModelAssemblerSupport<User, SafeUserDto> {
+        public SafeUserDtoAssembler() {
+            super(UserController.class, SafeUserDto.class);
+        }
+
+        @Override
+        public SafeUserDto toModel(User entity) {
+            ModelMapper modelMapper = new ModelMapper();
+            return modelMapper.map(entity, SafeUserDto.class);
+        }
+    }
+
+
+
 
 
 }
