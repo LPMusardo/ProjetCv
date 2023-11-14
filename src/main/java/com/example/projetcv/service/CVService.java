@@ -5,12 +5,14 @@ import com.example.projetcv.dao.CVRepository;
 import com.example.projetcv.dao.UserRepository;
 import com.example.projetcv.dto.CvDto;
 import com.example.projetcv.dto.UserSafeDto;
+import com.example.projetcv.exception.NotFoundException;
 import com.example.projetcv.model.Activity;
 import com.example.projetcv.model.CV;
 import com.example.projetcv.model.User;
 import jakarta.annotation.PostConstruct;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -49,7 +51,7 @@ public class CVService {
 
 
     public CV getCvById(Long id) {
-        return cvRepository.findById(id).get();
+        return cvRepository.findById(id).orElseThrow(() -> new NotFoundException("The CV of id"+ id +"doesn't exist", HttpStatus.NOT_FOUND));
     }
 
 
