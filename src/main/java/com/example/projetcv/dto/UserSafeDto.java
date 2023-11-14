@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 
 @Data
-public class UserSafeDto extends  RepresentationModel<UserSafeDto>{
+public class UserSafeDto extends RepresentationModel<UserSafeDto>{
 
     private Long id;
 

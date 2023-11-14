@@ -20,7 +20,7 @@ public class ActivityDto {
     private Nature nature;
 
 
-    @NotNull(message = "itle must not be null")
+    @NotNull(message = "title must not be null")
     @NotBlank(message = "title must not be blank")
     private String title;
 
