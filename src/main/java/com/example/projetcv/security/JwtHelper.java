@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public class JwtHelper {
     private long validityInMilliseconds;
 
     @Autowired
-    private UserDetailsServiceImpl userDetailsServiceImpl;
+    private UserDetailsService userDetailsServiceImpl;
 
     @PostConstruct
     protected void init() {
