@@ -28,6 +28,7 @@ public class CV {
     private User user;
 
 
+    @Builder.Default
     @JsonManagedReference
     @OneToMany(mappedBy = "cv", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<Activity> activities = new ArrayList<>();
