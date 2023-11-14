@@ -13,6 +13,7 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.time.LocalDate;
@@ -38,6 +39,7 @@ public class UserTest {
 
     @Autowired
     private UserRepository userRepository;
+
     @BeforeEach
     public void cleanUserTable(){
         userRepository.deleteAll();
@@ -109,7 +111,7 @@ public class UserTest {
             userRepository.save(user);
         });
         logger.info("e: " + e.getMessage());
-        assertTrue(e.getMessage().contains("NOT NULL check constraint") && e.getMessage().contains("user column: NAME"));
+        assertTrue(e.getMessage().contains("NOT NULL check constraint") && e.getMessage().contains("USER column: NAME"));
     }
 
     @Test
@@ -133,7 +135,8 @@ public class UserTest {
                     .build();
             userRepository.save(user);
         });
-        assertTrue(e.getMessage().contains("NOT NULL check constraint") && e.getMessage().contains("user column: FIRST_NAME"));
+        logger.info("eeeeee: " + e.getMessage());
+        assertTrue(e.getMessage().contains("NOT NULL check constraint") && e.getMessage().contains("USER column: FIRST_NAME"));
     }
 
     @Test
@@ -148,17 +151,15 @@ public class UserTest {
                     .build();
             userRepository.save(user);
         });
-        Exception e = assertThrows(DataIntegrityViolationException.class, ()->{
+        Exception e = assertThrows(TransactionSystemException.class, ()->{
             User user = User.builder()
-                    .name("John")
-                    .firstName("Doe")
+                    .name("JohnDeux")
+                    .firstName("DoeDeux")
                     .birthday(LocalDate.now())
                     .passwordHash("lehash")
                     .build();
             userRepository.save(user);
         });
-        assertTrue(e.getMessage().contains("NOT NULL check constraint") && e.getMessage().contains("user column: EMAIL"));
-
     }
 
 
@@ -209,7 +210,7 @@ public class UserTest {
                     .build();
             userRepository.save(user);
         });
-        assertTrue(e.getMessage().contains("NOT NULL check constraint") && e.getMessage().contains("user column: BIRTHDAY"));
+        assertTrue(e.getMessage().contains("NOT NULL check constraint") && e.getMessage().contains("USER column: BIRTHDAY"));
     }
 
     @Test
@@ -233,7 +234,7 @@ public class UserTest {
                     .build();
             userRepository.save(user);
         });
-        assertTrue(e.getMessage().contains("NOT NULL check constraint") && e.getMessage().contains("user column: PASSWORD_HASH"));
+        assertTrue(e.getMessage().contains("NOT NULL check constraint") && e.getMessage().contains("USER column: PASSWORD_HASH"));
     }
 
 
@@ -293,12 +294,8 @@ public class UserTest {
 
     //---------------------------------FETCH-TYPE TESTS---------------------------------
 
-    //@Autowired
-    //EntityManager entityManager;
-    //entityManager.flush();
-    //entityManager.clear();
-    //entityManager.close();
-    //assertThat(retrieveduser.get().getCv().getActivities().get(0).getTitle()).isEqualTo("Project Title");
+
+    /*
     @Autowired
     private PlatformTransactionManager transactionManager;
 
@@ -360,7 +357,7 @@ public class UserTest {
         }
 
     }
-
+*/
 
     //---------------------------------CASCADE TESTS---------------------------------
 

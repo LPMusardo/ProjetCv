@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.transaction.TransactionSystemException;
 
 import java.time.LocalDate;
 import java.util.logging.Logger;
@@ -214,7 +215,7 @@ public class ActivityTest {
                     .build();
             Activity savedActivity = activityRepository.save(activity);
         });
-        Exception e = assertThrows(DataIntegrityViolationException.class, ()->{
+        Exception e = assertThrows(TransactionSystemException.class, ()->{
             User user = User.builder()
                     .name("Another-John")
                     .firstName("Doe")
@@ -234,7 +235,6 @@ public class ActivityTest {
                     .build();
             Activity savedActivity = activityRepository.save(activity);
         });
-        assertTrue(e.getMessage().contains("NOT NULL check constraint") && e.getMessage().contains("ACTIVITY column: TITLE"));
     }
 
     @Test

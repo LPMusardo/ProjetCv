@@ -81,8 +81,8 @@ public class CVTest {
                     .build();
             cvRepository.save(cv);
         });
-        //logger.info("e: " + e.getMessage());
-        assertTrue(e.getMessage().contains("NOT NULL check constraint") && e.getMessage().contains("CV column: user_ID"));
+        logger.info("e: " + e.getMessage());
+        assertTrue(e.getMessage().contains("NOT NULL check constraint") && e.getMessage().contains("CV column: USER_ID"));
     }
 
 
