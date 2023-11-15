@@ -19,18 +19,14 @@ import java.util.logging.Logger;
 @RequestMapping("/api/cvs")
 public class CvController {
 
-    @Autowired
-    private UserService userService;
-
     private final Logger logger = Logger.getLogger(this.getClass().getName());
-
 
     @Autowired
     private CVService cvService;
 
 
-    //-----------------------------------------------------------------------
 
+    //-----------------------------------------------------------------------
 
 //    @GetMapping
 //    public List<CV> getAllCvs() {
