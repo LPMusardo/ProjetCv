@@ -126,7 +126,6 @@ class CvControllerTest {
 
     //------------------------------KO TESTS------------------------------
 
-
     private static Stream<Arguments> koUpdateCvTestInputs() {
         return Stream.of(
             Arguments.of(""),
@@ -165,79 +164,6 @@ class CvControllerTest {
                 .andDo(result -> logger.info("MESSAGE: "+result.getResponse().getContentAsString()))
                 .andExpect(status().isBadRequest());
     }
-
-    //------------------------------------------------------------
-
-/*    @Test
-    @SneakyThrows
-    @WithMockUser
-    void emptyUpdateCvTest() {
-        String goodJsonPayloadUpdateCv = "";
-        mvc.perform(patch("/api/cvs")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(goodJsonPayloadUpdateCv))
-                .andDo(result -> logger.info("MESSAGE: "+result.getResponse().getContentAsString()))
-                .andExpect(status().isBadRequest());
-    }
-
-
-    @Test
-    @SneakyThrows
-    @WithMockUser
-    void emptyJsonObjectUpdateCvTest() {
-        String goodJsonPayloadUpdateCv = """
-                {
-                }""";
-        mvc.perform(patch("/api/cvs")
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(goodJsonPayloadUpdateCv))
-                .andDo(result -> logger.info("MESSAGE: "+result.getResponse().getContentAsString()))
-                .andExpect(status().isBadRequest());
-    }
-
-
-    @Test
-    @SneakyThrows
-    @WithMockUser
-    void missingNatureUpdateCvTest() {
-        String goodJsonPayloadUpdateCv = """
-                {
-                    "activities": [
-                        {
-                            "title": "OUIII TEST "
-                        }
-                    ]
-                }""";
-        mvc.perform(patch("/api/cvs")
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(goodJsonPayloadUpdateCv))
-                .andDo(result -> logger.info("MESSAGE: "+result.getResponse().getContentAsString()))
-                .andExpect(status().isBadRequest());
-    }
-
-
-    @Test
-    @SneakyThrows
-    @WithMockUser
-    void missingTitleUpdateCvTest() {
-        String goodJsonPayloadUpdateCv = """
-                {
-                    "activities": [
-                        {
-                            "nature": "EDUCATION",
-                        }
-                    ]
-                }""";
-        mvc.perform(patch("/api/cvs")
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(goodJsonPayloadUpdateCv))
-                .andDo(result -> logger.info("MESSAGE: "+result.getResponse().getContentAsString()))
-                .andExpect(status().isBadRequest());
-    }*/
 
 
 
