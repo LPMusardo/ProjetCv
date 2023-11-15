@@ -87,7 +87,7 @@ public class GlobalExceptionHandlerController {
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public void handleValidationErrors(HttpServletResponse res, MethodArgumentNotValidException ex) throws IOException {
     //List<String> errors = ex.getBindingResult().getFieldErrors().stream().map(FieldError::getDefaultMessage).collect(Collectors.toList());
-    res.sendError(HttpStatus.BAD_REQUEST.value(), "ex.getMessage()");
+    res.sendError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
     //return new ResponseEntity<>(getErrorsMap(errors), new HttpHeaders(), HttpStatus.BAD_REQUEST);
   }
 
