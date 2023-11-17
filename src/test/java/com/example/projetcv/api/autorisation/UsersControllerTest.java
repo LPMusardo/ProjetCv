@@ -30,6 +30,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -66,6 +67,7 @@ public class UsersControllerTest {
         user.setName("John Doe");
         given(this.userService.getUserById(1L)).willReturn(user);
         given(this.userService.getUserById(2L)).willThrow(new NotFoundException("The user of id 2 doesn't exist", HttpStatus.NOT_FOUND));
+
     }
 
     @Test
@@ -88,5 +90,13 @@ public class UsersControllerTest {
                 .andExpect(status().reason(containsString("The user of id 2 doesn't exist")));
     }
 
+
+    @Test
+    public void testDeleteUserNotConnected() throws Exception {
+        mvc.perform(delete("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andExpect(status().reason(containsString("Access Denied")));
+    }
 
 }
