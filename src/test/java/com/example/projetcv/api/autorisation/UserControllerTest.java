@@ -2,6 +2,7 @@ package com.example.projetcv.api.autorisation;
 
 import com.example.projetcv.dto.UserSafeDto;
 import com.example.projetcv.dto.UserSignupDto;
+import com.example.projetcv.dto.UserUpdateDto;
 import com.example.projetcv.exception.NotFoundException;
 import com.example.projetcv.model.Activity;
 import com.example.projetcv.model.CV;
@@ -22,6 +23,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -164,6 +166,15 @@ public class UserControllerTest {
                         .content(objectMapper.writeValueAsString(userDTO)))
                 .andExpect(status().isCreated())
                 .andExpect(content().json("{\"id\":1,\"name\":\"ValidName\",\"firstName\":\"ValidFirstName\",\"email\":\"validemail@example.com\",\"website\":null,\"birthday\":\"2000-09-13\",\"cv\":null}"));
+    }
+
+    @Test
+    public void testUpdateUserNotConnected() throws Exception {
+        mvc.perform(patch("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andExpect(status().reason(containsString("Access Denied")));
+
     }
 
 
