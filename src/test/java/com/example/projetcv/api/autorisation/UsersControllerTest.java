@@ -127,4 +127,14 @@ public class UsersControllerTest {
     }
 
 
+    @Test
+    @WithMockUser
+    public void testSignUpConnectedNoBody() throws Exception {
+        mvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason(containsString("Required request body is missing")));
+    }
+
+
 }
