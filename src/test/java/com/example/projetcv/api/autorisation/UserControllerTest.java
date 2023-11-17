@@ -188,4 +188,32 @@ public class UserControllerTest {
     }
 
 
+    @Test
+    @WithMockUser
+    public void testUpdateUserConnected() throws Exception {
+        UserUpdateDto userDTO = new UserUpdateDto();
+        userDTO.setName("ValidName");
+        userDTO.setEmail("validemail@example.com");
+        userDTO.setBirthday(LocalDate.of(2000, 9, 13));
+        userDTO.setPassword("password");
+        userDTO.setPasswordConfirm("password");
+        userDTO.setFirstName("ValidFirstName");
+
+        UserSafeDto safeUser = new UserSafeDto();
+        safeUser.setName("ValidName");
+        safeUser.setEmail("validemail@example.com");
+        safeUser.setBirthday(LocalDate.of(2000, 9, 13));
+        safeUser.setFirstName("ValidFirstName");
+        safeUser.setId(1L);
+        given(userService.update(any(UserUpdateDto.class), any(UserDetails.class))).willReturn(safeUser);
+
+        mvc.perform(patch("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userDTO)))
+                .andExpect(status().isAccepted())
+                .andExpect(content().json("{\"id\":1,\"name\":\"ValidName\",\"firstName\":\"ValidFirstName\",\"email\":\"validemail@example.com\",\"website\":null,\"birthday\":\"2000-09-13\",\"cv\":null}"));
+
+    }
+
+
 }
