@@ -23,6 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -100,13 +101,21 @@ public class UsersControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", authorities = { "ADMIN", "USER" })
+    @WithMockUser(username = "admin", authorities = {"ADMIN", "USER"})
     public void testDeleteUserNotExist() throws Exception {
         given(this.userService.deleteById(anyString())).willThrow(new NotFoundException("The user of id 2 doesn't exist", HttpStatus.NOT_FOUND));
         mvc.perform(delete("/api/users")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(status().reason(containsString("The user of id 2 doesn't exist")));
+    }
+
+    @Test
+    @WithMockUser(username = "user", authorities = {"USER"})
+    public void testDeleteUserConnectedUser() throws Exception {
+        mvc.perform(delete("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
     }
 
 }
