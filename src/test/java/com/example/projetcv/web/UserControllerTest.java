@@ -1,4 +1,4 @@
-package com.example.projetcv.api.autorisation;
+package com.example.projetcv.web;
 
 import com.example.projetcv.dto.UserSafeDto;
 import com.example.projetcv.dto.UserSignupDto;
