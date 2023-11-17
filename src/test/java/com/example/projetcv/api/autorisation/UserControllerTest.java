@@ -39,7 +39,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class UsersControllerTest {
+public class UserControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
