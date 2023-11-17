@@ -104,7 +104,7 @@ public class UserService {
 
 
     public UserSafeDto getUserById(long id) {
-        User user  = userRepository.findById(id).orElseThrow(() -> new NotFoundException("The user of id"+ id +"doesn't exist", HttpStatus.NOT_FOUND));
+        User user  = userRepository.findById(id).orElseThrow(() -> new NotFoundException("The user of id "+ id +" doesn't exist", HttpStatus.NOT_FOUND));
         return modelMapper.map(user, UserSafeDto.class);
     }
 
