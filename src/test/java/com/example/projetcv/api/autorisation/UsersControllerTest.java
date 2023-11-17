@@ -78,4 +78,15 @@ public class UsersControllerTest {
                 .andExpect(content().json("{\"id\": 1, \"name\": \"John Doe\"}"));
     }
 
+    @Test
+    @WithMockUser
+    public void testGetUserNotFound() throws Exception {
+        mvc.perform(get("/api/users/2")
+                        .with(user("user").password("password"))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(status().reason(containsString("The user of id 2 doesn't exist")));
+    }
+
+
 }
