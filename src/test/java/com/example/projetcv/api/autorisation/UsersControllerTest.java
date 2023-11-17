@@ -99,4 +99,14 @@ public class UsersControllerTest {
                 .andExpect(status().reason(containsString("Access Denied")));
     }
 
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ADMIN", "USER" })
+    public void testDeleteUserNotExist() throws Exception {
+        given(this.userService.deleteById(anyString())).willThrow(new NotFoundException("The user of id 2 doesn't exist", HttpStatus.NOT_FOUND));
+        mvc.perform(delete("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(status().reason(containsString("The user of id 2 doesn't exist")));
+    }
+
 }
