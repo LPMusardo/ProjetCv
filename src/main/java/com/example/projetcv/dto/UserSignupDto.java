@@ -37,7 +37,6 @@ public class UserSignupDto {
     private String password;
 
     @NotNull(message = "passwordConfirm must not be null")
-    @NotBlank(message = "passwordConfirm must not be blank")
     private String passwordConfirm;
 
     @AssertTrue(message = "Password and password confirmation must match")
