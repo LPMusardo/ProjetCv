@@ -65,8 +65,8 @@ public class UserController {
 
     @PatchMapping
     public ResponseEntity<UserSafeDto> updateUser(@Valid @RequestBody UserUpdateDto userUpdateDto, @AuthenticationPrincipal UserDetails userDetails){
-        UserSafeDto userUpated = userService.update(userUpdateDto, userDetails);
-        return new ResponseEntity<>(userUpated, HttpStatus.ACCEPTED);
+        UserSafeDto userUpdated = userService.update(userUpdateDto, userDetails);
+        return new ResponseEntity<>(userUpdated, HttpStatus.ACCEPTED);
     }
 
 
