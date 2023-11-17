@@ -7,6 +7,7 @@ import com.example.projetcv.exception.NotFoundException;
 import com.example.projetcv.model.Activity;
 import com.example.projetcv.model.CV;
 import com.example.projetcv.model.Nature;
+import com.example.projetcv.model.User;
 import com.example.projetcv.service.UserService;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,6 +21,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -30,6 +36,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -209,11 +216,21 @@ public class UserControllerTest {
 
         mvc.perform(patch("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(userDTO)))
+                        .content(objectMapper.writeValueAsString(userDTO)))
                 .andExpect(status().isAccepted())
                 .andExpect(content().json("{\"id\":1,\"name\":\"ValidName\",\"firstName\":\"ValidFirstName\",\"email\":\"validemail@example.com\",\"website\":null,\"birthday\":\"2000-09-13\",\"cv\":null}"));
 
     }
 
-
+    // TODO
+    @Test
+    public void testSearchWithArgs() throws Exception {
+        UserSafeDto userSafeDto = new UserSafeDto();
+        // Perform and validate request
+        mvc.perform(get("/api/users"))
+                .andExpect(status().isOk());
+                //.andExpect(content().json("{\"content\":[" + objectMapper.writeValueAsString(userSafeDto) + "],\"page\":0,\"pageSize\":1,\"totalElements\":1}"));
+    }
 }
+
+
