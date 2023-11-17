@@ -118,4 +118,13 @@ public class UsersControllerTest {
                 .andExpect(status().isNoContent());
     }
 
+    @Test
+    public void testSignUpNotConnected() throws Exception {
+        mvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andExpect(status().reason(containsString("Access Denied")));
+    }
+
+
 }
