@@ -1,21 +1,19 @@
 package com.example.projetcv.api.autorisation;
 
 import com.example.projetcv.dto.UserSafeDto;
+import com.example.projetcv.dto.UserSignupDto;
 import com.example.projetcv.exception.NotFoundException;
 import com.example.projetcv.model.Activity;
 import com.example.projetcv.model.CV;
 import com.example.projetcv.model.Nature;
 import com.example.projetcv.service.UserService;
 
-import lombok.With;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
 
-
-import static org.mockito.ArgumentMatchers.anyLong;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -23,15 +21,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
+
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -42,6 +41,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 @AutoConfigureMockMvc
 public class UsersControllerTest {
 
+    @Autowired
+    private ObjectMapper objectMapper;
     @MockBean
     private UserService userService;
 
@@ -134,6 +135,35 @@ public class UsersControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(status().reason(containsString("Required request body is missing")));
+    }
+
+
+    @Test
+    @WithMockUser
+    public void testSignUpConnected() throws Exception {
+        UserSignupDto userDTO = new UserSignupDto();
+        userDTO.setName("ValidName");
+        userDTO.setEmail("validemail@example.com");
+        userDTO.setBirthday(LocalDate.of(2000, 9, 13));
+        userDTO.setPassword("password");
+        userDTO.setPasswordConfirm("password");
+        userDTO.setFirstName("ValidFirstName");
+
+        UserSafeDto safeUser = new UserSafeDto();
+        safeUser.setName("ValidName");
+        safeUser.setEmail("validemail@example.com");
+        safeUser.setBirthday(LocalDate.of(2000, 9, 13));
+        safeUser.setFirstName("ValidFirstName");
+        safeUser.setId(1L);
+
+        // set fields..
+        given(userService.signup(any(UserSignupDto.class))).willReturn(safeUser);
+
+        mvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userDTO)))
+                .andExpect(status().isCreated())
+                .andExpect(content().json("{\"id\":1,\"name\":\"ValidName\",\"firstName\":\"ValidFirstName\",\"email\":\"validemail@example.com\",\"website\":null,\"birthday\":\"2000-09-13\",\"cv\":null}"));
     }
 
 
