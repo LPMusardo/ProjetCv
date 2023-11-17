@@ -177,5 +177,15 @@ public class UserControllerTest {
 
     }
 
+    @Test
+    @WithMockUser
+    public void testUpdateUserConnectedNoBody() throws Exception {
+        mvc.perform(patch("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason(containsString("body")));
+
+    }
+
 
 }
