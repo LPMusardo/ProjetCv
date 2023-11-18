@@ -51,7 +51,7 @@ public class CVService {
 
 
     public CV getCvById(Long id) {
-        return cvRepository.findById(id).orElseThrow(() -> new NotFoundException("The CV of id"+ id +"doesn't exist", HttpStatus.NOT_FOUND));
+        return cvRepository.findById(id).orElseThrow(() -> new NotFoundException("The CV of id "+ id +" doesn't exist", HttpStatus.NOT_FOUND));
     }
 
 
