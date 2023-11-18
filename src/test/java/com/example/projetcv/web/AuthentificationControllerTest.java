@@ -1,7 +1,9 @@
 package com.example.projetcv.web;
 
 import com.example.projetcv.dto.LoginDto;
+import com.example.projetcv.dto.UserSafeDto;
 import com.example.projetcv.exception.MyJwtException;
+import com.example.projetcv.exception.NotFoundException;
 import com.example.projetcv.security.JwtHelper;
 import com.example.projetcv.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,14 +15,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -105,7 +108,6 @@ public class AuthentificationControllerTest {
     }
 
 
-
     @Test
     @WithMockUser
     public void testRefreshWithConnectedUser() throws Exception {
@@ -139,5 +141,28 @@ public class AuthentificationControllerTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(status().reason("User from token not found in database"));
     }
+
+
+    @Test
+    @WithMockUser
+    public void testWhoAmIWithConnectedUser() throws Exception {
+        UserSafeDto user = new UserSafeDto();
+
+        given(userService.whoami(any(UserDetails.class))).willReturn(user);
+
+        mvc.perform(get("/api/auth/me")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json("{\"id\":null,\"name\":null,\"firstName\":null,\"email\":null,\"website\":null,\"birthday\":null,\"cv\":null}"));
+    }
+
+    @Test
+    public void testWhoAmIWithUnconnectedUser() throws Exception {
+        mvc.perform(get("/api/auth/me")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andExpect(status().reason("Access Denied"));
+    }
+
 
 }
