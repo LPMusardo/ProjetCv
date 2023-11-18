@@ -2,7 +2,7 @@ package com.example.projetcv.web.validation;
 
 import com.example.projetcv.security.UserDetailsServiceImpl;
 import com.example.projetcv.service.UserService;
-import com.example.projetcv.web.AuthenticationController;
+import com.example.projetcv.web.AuthentificationController;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  **  Validation test of the DTOs with the "@Valid" of the controllers
  **/
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(AuthenticationController.class)
+@WebMvcTest(AuthentificationController.class)
 @ComponentScan(basePackages = {"com.example.projetcv.security"})
 class AuthenticationControllerTest {
 
