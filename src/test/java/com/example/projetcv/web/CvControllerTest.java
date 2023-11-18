@@ -73,6 +73,15 @@ public class CvControllerTest {
 
     }
 
+    @Test
+    public void testGetCvByIdNotConnected() throws Exception {
+        mvc.perform(get("/api/cvs/{id}", 1L)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json("{\"id\":null,\"activities\":[{\"id\":null,\"year\":2020,\"nature\":\"PROJECT\",\"title\":\"Test\",\"description\":\"Description of the test\",\"webAddress\":\"www.test.com\"}]}"));
+
+    }
+
 
 
 }
