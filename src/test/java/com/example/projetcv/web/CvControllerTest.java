@@ -1,7 +1,9 @@
 package com.example.projetcv.web;
 
+import com.example.projetcv.dto.ActivityDto;
 import com.example.projetcv.dto.CvDto;
 import com.example.projetcv.dto.UserSafeDto;
+import com.example.projetcv.dto.UserUpdateDto;
 import com.example.projetcv.exception.NotFoundException;
 import com.example.projetcv.model.Activity;
 import com.example.projetcv.model.CV;
@@ -26,10 +28,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -116,6 +120,39 @@ public class CvControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(status().reason(containsString("Required request body is missing")));
+
+    }
+
+    @Test
+    @WithMockUser
+    public void testUpdateCv() throws Exception {
+        CvDto cvDto = new CvDto();
+        List<ActivityDto> activities = new ArrayList<ActivityDto>();
+
+        ActivityDto activity = new ActivityDto();
+        activity.setYear(2020);
+        activity.setTitle("Test");
+        activity.setNature(Nature.PROJECT);
+        activity.setWebAddress("www.test.com");
+        activity.setDescription("Description of the test");
+        activities.add(activity);
+        cvDto.setActivities(activities);
+
+
+        UserSafeDto safeUser = new UserSafeDto();
+        safeUser.setName("ValidName");
+        safeUser.setEmail("validemail@example.com");
+        safeUser.setBirthday(LocalDate.of(2000, 9, 13));
+        safeUser.setFirstName("ValidFirstName");
+        safeUser.setId(1L);
+
+        given(cvService.updateCV(any(CvDto.class), any(UserDetails.class))).willReturn(safeUser);
+
+        mvc.perform(patch("/api/cvs")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(cvDto)))
+                .andExpect(status().isCreated())
+                .andExpect(content().json("{\"id\":1,\"name\":\"ValidName\",\"firstName\":\"ValidFirstName\",\"email\":\"validemail@example.com\",\"website\":null,\"birthday\":\"2000-09-13\",\"cv\":null}"));
 
     }
 
