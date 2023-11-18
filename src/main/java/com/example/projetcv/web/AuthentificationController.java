@@ -6,7 +6,6 @@ import com.example.projetcv.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -16,12 +15,12 @@ import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api/auth")
-public class AuthenticationController {
+public class AuthentificationController {
 
     @Autowired
     private UserService userService;
 
-    private Logger logger = Logger.getLogger(AuthenticationController.class.getName());
+    private Logger logger = Logger.getLogger(AuthentificationController.class.getName());
 
 
     //-----------------------------------------------------------------------------------
@@ -44,7 +43,6 @@ public class AuthenticationController {
     }
 
 
-
     /**
      * Récupérer un nouveau JWT
      */
@@ -61,7 +59,6 @@ public class AuthenticationController {
     public UserSafeDto whoami(@AuthenticationPrincipal UserDetails userDetails) {
         return userService.whoami(userDetails);
     }
-
 
 
 }
