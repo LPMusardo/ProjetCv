@@ -103,12 +103,21 @@ public class CvControllerTest {
     @Test
     public void testUpdateCvNotConnected() throws Exception {
         mvc.perform(patch("/api/cvs")
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden())
                 .andExpect(status().reason("Access Denied"));
 
     }
 
+    @Test
+    @WithMockUser
+    public void testUpdateCvNoBody() throws Exception {
+        mvc.perform(patch("/api/cvs")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason(containsString("Required request body is missing")));
+
+    }
 
 
 }
