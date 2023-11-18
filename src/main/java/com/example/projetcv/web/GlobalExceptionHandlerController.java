@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 
 import com.example.projetcv.exception.MyJwtException;
-import com.example.projetcv.exception.NotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
@@ -50,48 +49,47 @@ public class GlobalExceptionHandlerController {
   }*/
 
 
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public void handleHttpMessageNotReadableException(HttpServletResponse res, HttpMessageNotReadableException ex) throws IOException {
-        res.sendError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
-    }
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  public void handleHttpMessageNotReadableException(HttpServletResponse res, HttpMessageNotReadableException ex) throws IOException {
+    res.sendError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+  }
 
-    @ExceptionHandler(AccessDeniedException.class)
-    public void handleAccessDeniedException(HttpServletResponse res, AccessDeniedException ex) throws IOException {
-        res.sendError(HttpStatus.FORBIDDEN.value(), ex.getMessage());
-    }
+  @ExceptionHandler(AccessDeniedException.class)
+  public void handleAccessDeniedException(HttpServletResponse res, AccessDeniedException ex) throws IOException {
+    res.sendError(HttpStatus.FORBIDDEN.value(), ex.getMessage());
+  }
 
-    @ExceptionHandler(MyJwtException.class)
-    public void handleMyJwtException(HttpServletResponse res, MyJwtException ex) throws IOException {
-        SecurityContextHolder.clearContext();
-        res.sendError(ex.getHttpStatus().value(), ex.getMessage());
-    }
+  @ExceptionHandler(MyJwtException.class)
+  public void handleMyJwtException(HttpServletResponse res, MyJwtException ex) throws IOException {
+    SecurityContextHolder.clearContext();
+    res.sendError(ex.getHttpStatus().value(), ex.getMessage());
+  }
 
-    @ExceptionHandler(UsernameNotFoundException.class)
-    public void handleUsernameNotFoundException(HttpServletResponse res, UsernameNotFoundException ex) throws IOException {
-        res.sendError(HttpStatus.NOT_FOUND.value(), ex.getMessage());
-    }
+  @ExceptionHandler(UsernameNotFoundException.class)
+  public void handleUsernameNotFoundException(HttpServletResponse res, UsernameNotFoundException ex) throws IOException {
+    res.sendError(HttpStatus.NOT_FOUND.value(), ex.getMessage());
+  }
 
-    @ExceptionHandler(AuthenticationException.class)
-    public void handleAuthenticationException(HttpServletResponse res, AuthenticationException ex) throws IOException {
-        res.sendError(HttpStatus.UNAUTHORIZED.value(), ex.getMessage());
-    }
+  @ExceptionHandler(AuthenticationException.class)
+  public void handleAuthenticationException(HttpServletResponse res, AuthenticationException ex) throws IOException {
+    res.sendError(HttpStatus.UNAUTHORIZED.value(), ex.getMessage());
+  }
+  @ExceptionHandler(TransactionSystemException.class)
+  public void handleTransactionSystemException(HttpServletResponse res, TransactionSystemException ex) throws IOException {
+    res.sendError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+  }
 
-    @ExceptionHandler(TransactionSystemException.class)
-    public void handleTransactionSystemException(HttpServletResponse res, TransactionSystemException ex) throws IOException {
-        res.sendError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
-    }
+  @ExceptionHandler(NumberFormatException .class)
+  public void handleNumberFormatException(HttpServletResponse res, NumberFormatException ex) throws IOException {
+    res.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage());
+  }
 
-    @ExceptionHandler(NumberFormatException.class)
-    public void handleNumberFormatException(HttpServletResponse res, NumberFormatException ex) throws IOException {
-        res.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage());
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public void handleValidationErrors(HttpServletResponse res, MethodArgumentNotValidException ex) throws IOException {
-        //List<String> errors = ex.getBindingResult().getFieldErrors().stream().map(FieldError::getDefaultMessage).collect(Collectors.toList());
-        res.sendError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
-        //return new ResponseEntity<>(getErrorsMap(errors), new HttpHeaders(), HttpStatus.BAD_REQUEST);
-    }
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public void handleValidationErrors(HttpServletResponse res, MethodArgumentNotValidException ex) throws IOException {
+    //List<String> errors = ex.getBindingResult().getFieldErrors().stream().map(FieldError::getDefaultMessage).collect(Collectors.toList());
+    res.sendError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+    //return new ResponseEntity<>(getErrorsMap(errors), new HttpHeaders(), HttpStatus.BAD_REQUEST);
+  }
 
 //  private Map<String, List<String>> getErrorsMap(List<String> errors) {
 //    Map<String, List<String>> errorResponse = new HashMap<>();
@@ -99,16 +97,11 @@ public class GlobalExceptionHandlerController {
 //    return errorResponse;
 //  }
 
-    @ExceptionHandler(NotFoundException.class)
-    public void handleNotFoundException(HttpServletResponse res, NotFoundException ex) throws IOException {
-        res.sendError(HttpStatus.NOT_FOUND.value(), ex.getMessage());
-    }
 
-
-    @ExceptionHandler(Exception.class)
-    public void handleException(HttpServletResponse res) throws IOException {
-        res.sendError(HttpStatus.BAD_REQUEST.value(), "Something went wrong");
-    }
+  @ExceptionHandler(Exception.class)
+  public void handleException(HttpServletResponse res) throws IOException {
+    res.sendError(HttpStatus.BAD_REQUEST.value(), "Something went wrong");
+  }
 
 
 }

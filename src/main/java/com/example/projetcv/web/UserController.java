@@ -56,7 +56,7 @@ public class UserController {
     }
 
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<UserSafeDto> signup(@Valid @RequestBody UserSignupDto userDTO) {
         UserSafeDto newUser = userService.signup(userDTO);
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
