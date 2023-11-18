@@ -1,6 +1,7 @@
 package com.example.projetcv.web;
 
 import com.example.projetcv.dto.LoginDto;
+import com.example.projetcv.exception.MyJwtException;
 import com.example.projetcv.security.JwtHelper;
 import com.example.projetcv.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -102,5 +104,40 @@ public class AuthentificationControllerTest {
 
     }
 
+
+
+    @Test
+    @WithMockUser
+    public void testRefreshWithConnectedUser() throws Exception {
+        String expectedResponse = "Token refreshed successfully";
+        given(userService.refresh(any(HttpServletRequest.class))).willReturn(expectedResponse);
+
+        mvc.perform(get("/api/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().string(expectedResponse));
+    }
+
+    @Test
+    public void testRefreshWithUnconnectedUser() throws Exception {
+        String expectedResponse = "Access Denied";
+        given(userService.refresh(any(HttpServletRequest.class))).willReturn(expectedResponse);
+
+        mvc.perform(get("/api/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andExpect(status().reason(expectedResponse));
+    }
+
+    @Test
+    @WithMockUser
+    public void testRefreshWithBadToken() throws Exception {
+        given(userService.refresh(any(HttpServletRequest.class))).willThrow(new MyJwtException("User from token not found in database", HttpStatus.UNAUTHORIZED));
+
+        mvc.perform(get("/api/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized())
+                .andExpect(status().reason("User from token not found in database"));
+    }
 
 }
