@@ -24,27 +24,14 @@ public class CvController {
     @Autowired
     private CVService cvService;
 
-
-
     //-----------------------------------------------------------------------
 
-//    @GetMapping
-//    public List<CV> getAllCvs() {
-//        return cvService.getAllCv();
-//    }
 
-
+    //TODO: envoyer DTO
     @GetMapping("/{id}")
     public CV getCv(@PathVariable long id) {
         return cvService.getCvById(id);
     }
-
-
-/*    @DeleteMapping
-    public ResponseEntity<String> deleteCv(@AuthenticationPrincipal UserDetails userDetails) {
-        cvService.deleteCvByUserId(userDetails.getUsername());
-        return new ResponseEntity<>("CV deleted", HttpStatus.NO_CONTENT);
-    }*/
 
 
     @PatchMapping()

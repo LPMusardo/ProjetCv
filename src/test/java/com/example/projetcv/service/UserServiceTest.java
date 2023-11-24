@@ -79,7 +79,6 @@ class UserServiceTest {
         when(userRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
         when(userRepository.findAll()).thenReturn(List.of(testUser, testUser2));
         when(userRepository.findAllUsersWithFilters(any(), any(), any(), any())).thenReturn(new PageImpl<>(List.of(testUser)));
-        //when(userRepository.findById(anyLong())).thenReturn(java.util.Optional.of(testUser));
 
         UserDetails testUserDetail = org.springframework.security.core.userdetails.User
                 .withUsername("999")
@@ -100,8 +99,8 @@ class UserServiceTest {
     @Autowired
     private UserService userService;
 
-
     //----------------------------------------------------
+
 
     @Test
     void login() {
@@ -133,7 +132,7 @@ class UserServiceTest {
         userDTO.setPasswordConfirm("password");
         when(userRepository.findByEmail("newemail@email.com")).thenReturn(java.util.Optional.ofNullable(null));
         assertDoesNotThrow(()->{
-            UserSafeDto userSafeDto = userService.signup(userDTO);
+            UserSafeDto userSafeDto = userService.createUser(userDTO);
             assertEquals(userSafeDto.getName(), userDTO.getName());
         });
     }
@@ -192,15 +191,15 @@ class UserServiceTest {
     @Test
     void getAllUsers() {
         UserSafeDto[] users = userService.getAllUsers();
-        assertTrue(users.length==2);
-        assertTrue(users[0].getName().equals("John"));
-        assertTrue(users[1].getName().equals("John2"));
+        assertEquals(2, users.length);
+        assertEquals("John", users[0].getName());
+        assertEquals("John2", users[1].getName());
     }
 
     @Test
     void getAllUsersWithFilter() {
         PagedModel<UserSafeDto> users = userService.getAllUsersWithFilter("John", "Doe", "", null);
-        assertTrue(users.getContent().size()==1);
+        assertEquals(1, users.getContent().size());
         assertTrue(users.hasLink("self"));
     }
 }

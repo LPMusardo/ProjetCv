@@ -48,10 +48,11 @@ class UserControllerTest {
     @BeforeEach
     void setUp() {
         UserSafeDto userSafeDto = new UserSafeDto();
-        when(userService.signup(any())).thenReturn(userSafeDto);
+        when(userService.createUser(any())).thenReturn(userSafeDto);
     }
 
     //------------------------------------------------------------------------------
+
 
     private static Stream<Arguments> signupTestInputs() {
         Stream<Arguments> goodInputs = Stream.of(
@@ -221,7 +222,6 @@ class UserControllerTest {
 
 
 
-
     //------------------------------------------------------------------------------
 
     private static Stream<Arguments> updateUserTestInputs() {
@@ -302,7 +302,6 @@ class UserControllerTest {
             .andDo(result -> logger.info("MESSAGE: " + result.getResponse().getContentAsString()))
             .andExpect(expectedStatus);
     }
-
 
 
 }

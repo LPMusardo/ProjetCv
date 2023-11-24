@@ -59,8 +59,8 @@ public class UserService {
         modelMapper.getConfiguration().setSkipNullEnabled(true);
 
         //
-        var typemape = modelMapper.createTypeMap(UserSignupDto.class, User.class);
-        typemape.addMapping(UserSignupDto::getPassword, User::setPasswordHash);
+        var typeMap = modelMapper.createTypeMap(UserSignupDto.class, User.class);
+        typeMap.addMapping(UserSignupDto::getPassword, User::setPasswordHash);
         //
 
     }
@@ -81,7 +81,7 @@ public class UserService {
     }
 
 
-    public UserSafeDto signup(UserSignupDto userDTO) {
+    public UserSafeDto createUser(UserSignupDto userDTO) {
         logger.info("Beginning signup...");
         logger.info("userDto : " + userDTO);
         if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {

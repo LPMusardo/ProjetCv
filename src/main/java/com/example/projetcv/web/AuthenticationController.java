@@ -15,12 +15,12 @@ import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api/auth")
-public class AuthentificationController {
+public class AuthenticationController {
 
     @Autowired
     private UserService userService;
 
-    private Logger logger = Logger.getLogger(AuthentificationController.class.getName());
+    private Logger logger = Logger.getLogger(AuthenticationController.class.getName());
 
 
     //-----------------------------------------------------------------------------------

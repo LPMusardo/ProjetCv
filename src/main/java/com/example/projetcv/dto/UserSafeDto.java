@@ -4,6 +4,7 @@ import com.example.projetcv.model.CV;
 import com.example.projetcv.model.User;
 import com.example.projetcv.web.UserController;
 import lombok.Data;
+import lombok.NonNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 
 @Data
-public class UserSafeDto extends RepresentationModel<UserSafeDto>{
+public class UserSafeDto extends RepresentationModel<UserSafeDto> {
 
     private Long id;
 
@@ -36,14 +37,12 @@ public class UserSafeDto extends RepresentationModel<UserSafeDto>{
         }
 
         @Override
-        public UserSafeDto toModel(User entity) {
+        @NonNull
+        public UserSafeDto toModel(@NonNull User entity) {
             ModelMapper modelMapper = new ModelMapper();
             return modelMapper.map(entity, UserSafeDto.class);
         }
     }
-
-
-
 
 
 }

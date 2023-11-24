@@ -55,13 +55,6 @@ public class CVService {
     }
 
 
-/*
-    public void deleteCvByUserId(String id) {
-        cvRepository.deleteById(Long.parseLong(id));
-    }
-*/
-
-
     public UserSafeDto updateCV(CvDto cvDto, UserDetails userDetails){
         logger.info("Beginning update...");
         User user = userRepository.findById(Long.parseLong(userDetails.getUsername())).orElseThrow(() -> new UsernameNotFoundException("User with id'" + userDetails.getUsername() + "' not found"));
@@ -85,7 +78,6 @@ public class CVService {
 
         return modelMapper.map(userUpdated, UserSafeDto.class);
     }
-
 
 
 }

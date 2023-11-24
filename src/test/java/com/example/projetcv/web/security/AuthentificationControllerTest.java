@@ -1,4 +1,4 @@
-package com.example.projetcv.web;
+package com.example.projetcv.web.security;
 
 import com.example.projetcv.dto.LoginDto;
 import com.example.projetcv.dto.UserSafeDto;

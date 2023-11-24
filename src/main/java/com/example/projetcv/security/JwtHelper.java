@@ -119,12 +119,4 @@ public class JwtHelper {
     }
 
 
-
-
-
-//    public Jwt<Header, Claims> getTokenInfo(String token) {
-//        String tokenWithoutSign = token.substring(0,token.lastIndexOf("."));
-//        return Jwts.parser().parseClaimsJwt(tokenWithoutSign);
-//    }
-
 }

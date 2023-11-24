@@ -21,7 +21,6 @@ import java.util.logging.Logger;
  * vérifier si il existe afin de construire le contexte de sécurité Spring
  * Security.
  */
-
 @Component
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {

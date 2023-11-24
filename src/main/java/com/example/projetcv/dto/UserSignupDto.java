@@ -10,7 +10,6 @@ import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class UserSignupDto {
 
     @NotNull(message = "name must not be null")

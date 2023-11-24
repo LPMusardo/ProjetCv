@@ -1,4 +1,4 @@
-package com.example.projetcv.web;
+package com.example.projetcv.web.security;
 
 import com.example.projetcv.dto.UserSafeDto;
 import com.example.projetcv.dto.UserSignupDto;
@@ -67,7 +67,6 @@ public class UserControllerTest {
         user.setName("John Doe");
         given(this.userService.getUserById(1L)).willReturn(user);
         given(this.userService.getUserById(2L)).willThrow(new NotFoundException("The user of id 2 doesn't exist", HttpStatus.NOT_FOUND));
-
     }
 
     @Test
@@ -155,7 +154,7 @@ public class UserControllerTest {
         safeUser.setId(1L);
 
         // set fields..
-        given(userService.signup(any(UserSignupDto.class))).willReturn(safeUser);
+        given(userService.createUser(any(UserSignupDto.class))).willReturn(safeUser);
 
         mvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -170,7 +169,6 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden())
                 .andExpect(status().reason(containsString("Access Denied")));
-
     }
 
     @Test
@@ -180,7 +178,6 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(status().reason(containsString("body")));
-
     }
 
 
@@ -208,7 +205,6 @@ public class UserControllerTest {
                         .content(objectMapper.writeValueAsString(userDTO)))
                 .andExpect(status().isAccepted())
                 .andExpect(content().json("{\"id\":1,\"name\":\"ValidName\",\"firstName\":\"ValidFirstName\",\"email\":\"validemail@example.com\",\"website\":null,\"birthday\":\"2000-09-13\",\"cv\":null}"));
-
     }
 
     // TODO
@@ -218,8 +214,9 @@ public class UserControllerTest {
         // Perform and validate request
         mvc.perform(get("/api/users"))
                 .andExpect(status().isOk());
-                //.andExpect(content().json("{\"content\":[" + objectMapper.writeValueAsString(userSafeDto) + "],\"page\":0,\"pageSize\":1,\"totalElements\":1}"));
     }
+
+
 }
 
 

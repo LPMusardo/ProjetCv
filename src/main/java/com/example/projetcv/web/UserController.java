@@ -29,8 +29,6 @@ public class UserController {
 
     private Logger logger = Logger.getLogger(this.getClass().getName());
 
-
-
     //------------------------------------------------------------------------------
 
 
@@ -57,8 +55,8 @@ public class UserController {
 
 
     @PostMapping
-    public ResponseEntity<UserSafeDto> signup(@Valid @RequestBody UserSignupDto userDTO) {
-        UserSafeDto newUser = userService.signup(userDTO);
+    public ResponseEntity<UserSafeDto> createUser(@Valid @RequestBody UserSignupDto userDTO) {
+        UserSafeDto newUser = userService.createUser(userDTO);
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
 

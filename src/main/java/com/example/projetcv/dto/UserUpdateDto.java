@@ -9,7 +9,6 @@ import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class UserUpdateDto {
 
     /*null is valid*/

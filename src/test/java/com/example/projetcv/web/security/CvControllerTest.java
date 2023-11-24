@@ -1,4 +1,4 @@
-package com.example.projetcv.web;
+package com.example.projetcv.web.security;
 
 import com.example.projetcv.dto.ActivityDto;
 import com.example.projetcv.dto.CvDto;
@@ -65,7 +65,6 @@ public class CvControllerTest {
         user.setName("John Doe");
         given(this.cvService.getCvById(1L)).willReturn(cv);
         given(this.cvService.getCvById(2L)).willThrow(new NotFoundException("The CV of id 2 doesn't exist", HttpStatus.NOT_FOUND));
-
     }
 
     @Test
@@ -76,44 +75,36 @@ public class CvControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\"id\":null,\"activities\":[{\"id\":null,\"year\":2020,\"nature\":\"PROJECT\",\"title\":\"Test\",\"description\":\"Description of the test\",\"webAddress\":\"www.test.com\"}]}"));
-
     }
 
     @Test
     public void testGetCvByIdNotConnected() throws Exception {
-        mvc.perform(get("/api/cvs/{id}", 1L)
-                        .contentType(MediaType.APPLICATION_JSON))
+        mvc.perform(get("/api/cvs/{id}", 1L).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\"id\":null,\"activities\":[{\"id\":null,\"year\":2020,\"nature\":\"PROJECT\",\"title\":\"Test\",\"description\":\"Description of the test\",\"webAddress\":\"www.test.com\"}]}"));
-
     }
 
     @Test
     @WithMockUser
     public void testGetCvByIdNotExisting() throws Exception {
-        mvc.perform(get("/api/cvs/{id}", 2L)
-                        .contentType(MediaType.APPLICATION_JSON))
+        mvc.perform(get("/api/cvs/{id}", 2L).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(status().reason("The CV of id 2 doesn't exist"));
     }
 
     @Test
     public void testUpdateCvNotConnected() throws Exception {
-        mvc.perform(patch("/api/cvs")
-                        .contentType(MediaType.APPLICATION_JSON))
+        mvc.perform(patch("/api/cvs").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden())
                 .andExpect(status().reason("Access Denied"));
-
     }
 
     @Test
     @WithMockUser
     public void testUpdateCvNoBody() throws Exception {
-        mvc.perform(patch("/api/cvs")
-                        .contentType(MediaType.APPLICATION_JSON))
+        mvc.perform(patch("/api/cvs").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(status().reason(containsString("Required request body is missing")));
-
     }
 
     @Test
@@ -131,7 +122,6 @@ public class CvControllerTest {
         activities.add(activity);
         cvDto.setActivities(activities);
 
-
         UserSafeDto safeUser = new UserSafeDto();
         safeUser.setName("ValidName");
         safeUser.setEmail("validemail@example.com");
@@ -142,11 +132,10 @@ public class CvControllerTest {
         given(cvService.updateCV(any(CvDto.class), any(UserDetails.class))).willReturn(safeUser);
 
         mvc.perform(patch("/api/cvs")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(cvDto)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(cvDto)))
                 .andExpect(status().isCreated())
                 .andExpect(content().json("{\"id\":1,\"name\":\"ValidName\",\"firstName\":\"ValidFirstName\",\"email\":\"validemail@example.com\",\"website\":null,\"birthday\":\"2000-09-13\",\"cv\":null}"));
-
     }
 
 

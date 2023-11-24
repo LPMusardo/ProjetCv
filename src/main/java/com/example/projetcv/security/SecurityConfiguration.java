@@ -64,8 +64,6 @@ public class SecurityConfiguration {
                 .anyRequest().permitAll()
             );
 
-        //.cors();
-
         return http.build();
     }
 
