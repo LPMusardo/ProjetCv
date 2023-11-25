@@ -54,7 +54,7 @@ public class UserService {
 
 
     @PostConstruct
-    private void init(){
+    private void init() {
         modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setSkipNullEnabled(true);
 
@@ -97,14 +97,14 @@ public class UserService {
 
 
     public UserSafeDto deleteById(String id) {
-        User userToDelete = userRepository.findById(Long.parseLong(id)).orElseThrow(() -> new NotFoundException("The user of id"+ id +"doesn't exist", HttpStatus.NOT_FOUND));
+        User userToDelete = userRepository.findById(Long.parseLong(id)).orElseThrow(() -> new NotFoundException("The user of id" + id + "doesn't exist", HttpStatus.NOT_FOUND));
         userRepository.deleteById(Long.parseLong(id));
         return modelMapper.map(userToDelete, UserSafeDto.class);
     }
 
 
     public UserSafeDto getUserById(long id) {
-        User user  = userRepository.findById(id).orElseThrow(() -> new NotFoundException("The user of id "+ id +" doesn't exist", HttpStatus.NOT_FOUND));
+        User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException("The user of id " + id + " doesn't exist", HttpStatus.NOT_FOUND));
         return modelMapper.map(user, UserSafeDto.class);
     }
 
@@ -117,7 +117,7 @@ public class UserService {
     public String refresh(HttpServletRequest req) {
         String initialToken = jwtHelper.resolveToken(req);
         String userId = jwtHelper.getUserId(initialToken);
-        User user = userRepository.findById(Long.parseLong(userId)).orElseThrow(()-> new MyJwtException("User from token not found in database", HttpStatus.UNAUTHORIZED));
+        User user = userRepository.findById(Long.parseLong(userId)).orElseThrow(() -> new MyJwtException("User from token not found in database", HttpStatus.UNAUTHORIZED));
         String newToken = jwtHelper.createToken(user);
         jwtHelper.removeTokenFromWhiteList(initialToken);
         return newToken;
@@ -126,6 +126,9 @@ public class UserService {
 
     public UserSafeDto update(UserUpdateDto userUpdateDto, UserDetails userDetails) {
         User user = userRepository.findById(Long.parseLong(userDetails.getUsername())).orElseThrow(() -> new UsernameNotFoundException("User with id'" + userDetails.getUsername() + "' not found"));
+        if (userUpdateDto.getPassword() != null) {
+            user.setPasswordHash(passwordEncoder.encode(userUpdateDto.getPassword()));
+        }
         logger.info("user to update :\n" + user);
         logger.info("user proposition :\n" + userUpdateDto);
         modelMapper.map(userUpdateDto, user);
@@ -145,7 +148,6 @@ public class UserService {
         PagedModel<UserSafeDto> userPageHateoas = pagedResourcesAssembler.toModel(userPage, safeUserModelAssembler);
         return userPageHateoas;
     }
-
 
 
 }
