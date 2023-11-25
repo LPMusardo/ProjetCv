@@ -40,6 +40,8 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+        http.cors(withDefaults());
         http.csrf(AbstractHttpConfigurer::disable);
 
         http.sessionManagement(sess -> sess.sessionCreationPolicy((SessionCreationPolicy.STATELESS)));
@@ -49,20 +51,20 @@ public class SecurityConfiguration {
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         http.authorizeHttpRequests(
-            auth -> auth
-                .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
-                //
-                .requestMatchers("/api/auth/login").permitAll()
-                .requestMatchers("/api/auth/**").authenticated()
-                //
-                .requestMatchers(HttpMethod.DELETE, "/api/users").authenticated()
-                .requestMatchers(HttpMethod.PATCH, "/api/users").authenticated()
-                .requestMatchers(HttpMethod.POST, "/api/users").authenticated()
-                //
-                .requestMatchers(HttpMethod.PATCH, "/api/cvs").authenticated()
-                //
-                .anyRequest().permitAll()
-            );
+                auth -> auth
+                        .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
+                        //
+                        .requestMatchers("/api/auth/login").permitAll()
+                        .requestMatchers("/api/auth/**").authenticated()
+                        //
+                        .requestMatchers(HttpMethod.DELETE, "/api/users").authenticated()
+                        .requestMatchers(HttpMethod.PATCH, "/api/users").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/users").authenticated()
+                        //
+                        .requestMatchers(HttpMethod.PATCH, "/api/cvs").authenticated()
+                        //
+                        .anyRequest().permitAll()
+        );
 
         return http.build();
     }
