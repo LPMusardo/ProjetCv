@@ -4,5 +4,11 @@
       "name": "com.example.projetcv.jwt.use-whitelist",
       "type": "java.lang.Boolean",
       "description": "whether to use whitelist for validating JWT tokens or not."
-  }
-] }
+    },
+    {
+      "name": "com.example.projetcv.db.number-random-users",
+      "type": "java.lang.Integer",
+      "description": "Number of random users to generate in the database at startup."
+    }
+  ]
+}

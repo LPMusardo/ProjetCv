@@ -7,6 +7,7 @@ import com.example.projetcv.model.Nature;
 import com.example.projetcv.model.User;
 import com.github.javafaker.Faker;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 
 import java.time.LocalDate;
+import java.util.logging.Logger;
 
 import static org.apache.commons.lang3.StringUtils.stripAccents;
 
@@ -26,15 +28,23 @@ public class PopulateDataBase implements CommandLineRunner {
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    @Value("${com.example.projetcv.db.number-random-users:10000}")
+    private int numberOfRandomUsers;
+
     private Random random = new Random(42);
     Faker faker = new Faker(new Locale("fr", "FR"), new Random(42));
 
+    private Logger logger = Logger.getLogger(this.getClass().getName());
+
+
+    //------------------------------------------------------------------
 
     @Override
     public void run(String... args) throws Exception {
         clearDb();
         generateCustomUsers();
-        generateRandomUsers(100);
+        generateRandomUsers(numberOfRandomUsers);
+        logger.info("Database populated");
     }
 
     private void clearDb() {
@@ -51,7 +61,7 @@ public class PopulateDataBase implements CommandLineRunner {
 
             // required
             var user = User.builder().name(pFirstName).firstName(pLastName).birthday(LocalDate.ofYearDay(randomInt(1950,2001), randomInt(1,365)))
-                    .email(faker.internet().emailAddress(pFirstName.toLowerCase() + i)).passwordHash(hash).website(pFirstName + "." + pLastName + ".com").build();
+                    .email(faker.internet().emailAddress(pFirstName.toLowerCase() + i)).passwordHash(hash).website(pFirstName.toLowerCase() + "." + pLastName.toLowerCase() + ".com").build();
             // optional
             if (i % 2 == 0) {
                 user.setRoles(Set.of("USER"));
@@ -72,7 +82,7 @@ public class PopulateDataBase implements CommandLineRunner {
         List<Activity> activities = new ArrayList<>(nbActivities);
 
         for (int i = 0; i < nbActivities; i++) {
-            Activity activity = Activity.builder().cv(cv).year(randomInt(2000, 2023)).nature(Nature.randomNature()).title(faker.job().seniority() + " " + faker.job().position() + faker.job().field() + " " + faker.job().keySkills() + " " + faker.job().title()).build();
+            Activity activity = Activity.builder().cv(cv).year(randomInt(2000, 2023)).nature(Nature.randomNature()).title(faker.job().seniority() + " " + faker.job().position() + " " +faker.job().field() + " " + faker.job().keySkills()).build();
             if (random.nextBoolean()) activity.setWebAddress(faker.internet().url());
             if (random.nextBoolean()) activity.setDescription(faker.lorem().paragraph(randomInt(1, 3)));
             activities.add(activity);
