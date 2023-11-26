@@ -18,7 +18,7 @@ public class CleanWhiteListJwtConfig {
 
 
     /*Time in milliseconds*/
-    @Scheduled(fixedDelay = 1000, initialDelay = 15000)
+    @Scheduled(fixedDelay = 10000, initialDelay = 15000)
     public void scheduleFixedRateWithInitialDelayTask() {
         jwtWhitelist.cleanExpiredTokens();
     }
