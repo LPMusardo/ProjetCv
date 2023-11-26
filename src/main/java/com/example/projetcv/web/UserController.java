@@ -36,7 +36,7 @@ public class UserController {
     public PagedModel<UserSafeDto> getUsers(@RequestParam(defaultValue = "%") String name,
                                             @RequestParam(defaultValue = "%") String firstName,
                                             @RequestParam(defaultValue = "%") String activityTitle,
-                                            @PageableDefault(page = 0, size = 5, direction = Direction.ASC, sort = {"name", "firstName"} ) Pageable pageable) {
+                                            @PageableDefault(page = 0, size = 10, direction = Direction.ASC, sort = {"firstName", "name"} ) Pageable pageable) {
         return userService.getAllUsersWithFilter(name, firstName, activityTitle, pageable);
     }
 
